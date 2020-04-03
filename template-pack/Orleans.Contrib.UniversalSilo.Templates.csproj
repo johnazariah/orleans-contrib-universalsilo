@@ -2,8 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageType>Template</PackageType>
-    <Version>0.5.0</Version>
-    <PackageVersion>0.5.0</PackageVersion>
+    <Version>0.5.1</Version>
+    <PackageVersion>0.5.1</PackageVersion>
     <PackageId>Orleans.Contrib.UniversalSilo.Templates</PackageId>
     <Title>Templates for Orleans Applications using the UniversalSilo Library</Title>
     <Description>These are templates to get you easily started with Orleans with very little boilerplate code</Description>
