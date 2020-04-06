@@ -65,3 +65,16 @@ docker-show:
 	$(eval container_ident   := $(shell docker ps | awk '$$2 ~ "$(container_name)" {print $$1}'))
 	$(eval container_address := $(shell docker container inspect $(container_ident) --format "{{.NetworkSettings.IPAddress}}"))
 	@echo Running the docker image at $(container_ident) @ $(container_address)
+
+docker-stop :
+	@echo Stopping all  containers
+	- docker stop $(shell docker ps -aq)
+
+docker-kill : docker-stop
+	@echo Killing and removing all containers
+	- docker rm -f $(shell docker ps -aq)
+	- docker kill  $(shell docker ps -aq)
+
+docker-clean : docker-kill
+	@echo Pruning all images
+	- docker image prune -af
