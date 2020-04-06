@@ -3,8 +3,8 @@ name: .NET Core
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    paths:
+    - "universal-silo"
 
 jobs:
   build:
@@ -29,10 +29,3 @@ jobs:
         PROJECT_FILE_PATH: universal-silo/universal-silo.fsproj
         NUGET_KEY:    ${{secrets.NUGET_API_KEY}}
         PACKAGE_NAME: Orleans.Contrib.UniversalSilo
-    - name: Publish Templates
-      uses: johnazariah/publish-nuget@master
-      with:
-        PROJECT_FILE_PATH: template-pack/Orleans.Contrib.UniversalSilo.Templates.csproj
-        NUGET_KEY:    ${{secrets.NUGET_API_KEY}}
-        PACKAGE_NAME: Orleans.Contrib.UniversalSilo.Templates
-
