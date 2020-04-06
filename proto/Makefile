@@ -8,6 +8,7 @@ SHELL = CMD
 # project name
 silo=standalone-silo
 client=standalone-client
+webapi=webapi-directclient
 
 # project configuration
 config:=Debug
@@ -28,15 +29,18 @@ silo_address:=172.17.0.2
 dotnet-clean dotnet-build dotnet-run:
 	$(MAKE) -f   $(silo).Makefile project=$(silo)   config=$(config) $@
 	$(MAKE) -f $(client).Makefile project=$(client) config=$(config) $@
+	$(MAKE) -f $(webapi).Makefile project=$(webapi) config=$(config) $@
 
 # Docker commands
 docker-build :
 	$(MAKE) -f   $(silo).Makefile project=$(silo)   config=$(config) container_name=$(container_name) $@
 	$(MAKE) -f $(client).Makefile project=$(client) config=$(config) container_name=$(container_name) $@
+	$(MAKE) -f $(webapi).Makefile project=$(webapi) config=$(config) container_name=$(container_name) $@
 
 docker-run docker-push docker-image-explore docker-show:
 	$(MAKE) -f   $(silo).Makefile container_name=$(container_name) $@
 	$(MAKE) -f $(client).Makefile container_name=$(container_name) $@
+	$(MAKE) -f $(webapi).Makefile container_name=$(container_name) $@
 
 docker-stop :
 	@echo Stopping all  containers
