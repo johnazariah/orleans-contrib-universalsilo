@@ -1,1 +1,17 @@
+name: Orleans (Contrib) Universal Silo
+description: An opinionated, batteries-included, set of templates and libraries to enable you to easily start developing applications with Microsoft Orleans.
 theme: jekyll-theme-cayman
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: true
+include:
+  - ../README.md
+  - ../LICENSE
+  # - COPYING.md
+  # - CODE_OF_CONDUCT.md
+  # - CONTRIBUTING.md
+  # - ISSUE_TEMPLATE.md
+  # - PULL_REQUEST_TEMPLATE.md
+  - Introduction.md
