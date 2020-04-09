@@ -21,7 +21,7 @@ The philosophy behind this library is as follows:
 
 The documentation is structured as follows:
 
-- [The Development Process](Development.md)
-- [Configuration](Configuration.md)
-- [Packaging](Packaging.md)
-- [Deployment](Deployment.md)
+- [The Development Process](development.md)
+- [Configuration](configuration.md)
+- [Packaging](packaging.md)
+- [Deployment](deployment.md)
