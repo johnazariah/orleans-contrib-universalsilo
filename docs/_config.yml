@@ -6,3 +6,5 @@ description: An opinionated, batteries-included, set of templates and libraries 
 # relative_links:
 #   enabled: true
 #   collections: true
+
+theme: jekyll-theme-slate
