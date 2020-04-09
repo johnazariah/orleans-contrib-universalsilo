@@ -32,9 +32,4 @@ The philosophy behind this library is to:
     * Deployment as Azure App Service with a Site Plan on Scale Sets
     * Deployment on Azure Kubernetes Service on Scale Sets
 
-The documentation is structured as follows:
-
-- [The Development Process](development.md)
-- [Configuration](configuration.md)
-- [Building and Packaging](building-and-packaging.md)
-- [Deployment](deployment.md)
+[Documentation is available here.](https://johnazariah.github.io/orleans-contrib-universalsilo/)
