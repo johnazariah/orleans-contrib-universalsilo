@@ -1,8 +1,10 @@
 source:=
 target:=
 
-source_root = proto
-target_root = template-pack/templates
+suffix:=
+
+source_root:=proto
+target_root:=test/templates
 
 copy:
 	mkdir -p $(target)
@@ -10,37 +12,44 @@ copy:
 	# cp -r $(source) $(target)
 
 load.%.templates :
-	- cp -r $(source_root)/templates/$*/.template.config $(target_root)/$*
+	- cp -r $(source_root)-$(suffix)/templates/$*/.template.config $(target_root)/$*-$(suffix)
 
 load.%.files :
-	- cp $(source_root)/$*.sln $(target_root)/$*
-	- cp $(source_root)/$*.Makefile $(target_root)/$*/Makefile
+	- cp $(source_root)-$(suffix)/$*.sln $(target_root)/$*-$(suffix)
+	- cp $(source_root)-$(suffix)/$*.Makefile $(target_root)/$*-$(suffix)/Makefile
 
 load.silo-and-client : load.% : load.%.templates load.%.files
-	$(MAKE) source=$(source_root)/grains            target=$(target_root)/$*/grains copy
-	$(MAKE) source=$(source_root)/grain-tests       target=$(target_root)/$*/grain-tests copy
-	$(MAKE) source=$(source_root)/standalone-silo   target=$(target_root)/$*/standalone-silo copy
-	$(MAKE) source=$(source_root)/standalone-client target=$(target_root)/$*/standalone-client copy
-	cp $(source_root)/standalone-silo.Dockerfile   $(target_root)/$*
-	cp $(source_root)/standalone-silo.Makefile     $(target_root)/$*
-	cp $(source_root)/standalone-client.Dockerfile $(target_root)/$*
-	cp $(source_root)/standalone-client.Makefile   $(target_root)/$*
-	cp $(source_root)/$*.docker-compose.yml        $(target_root)/$*/docker-compose.yml
+	$(MAKE) source=$(source_root)-$(suffix)/grains            target=$(target_root)/$*-$(suffix)/grains copy
+	$(MAKE) source=$(source_root)-$(suffix)/grain-tests       target=$(target_root)/$*-$(suffix)/grain-tests copy
+	$(MAKE) source=$(source_root)-$(suffix)/standalone-silo   target=$(target_root)/$*-$(suffix)/standalone-silo copy
+	$(MAKE) source=$(source_root)-$(suffix)/standalone-client target=$(target_root)/$*-$(suffix)/standalone-client copy
+	cp $(source_root)-$(suffix)/standalone-silo.Dockerfile   $(target_root)/$*-$(suffix)
+	cp $(source_root)-$(suffix)/standalone-silo.Makefile     $(target_root)/$*-$(suffix)
+	cp $(source_root)-$(suffix)/standalone-client.Dockerfile $(target_root)/$*-$(suffix)
+	cp $(source_root)-$(suffix)/standalone-client.Makefile   $(target_root)/$*-$(suffix)
+	cp $(source_root)-$(suffix)/$*.docker-compose.yml        $(target_root)/$*-$(suffix)/docker-compose.yml
 
 load.standalone-silo load.standalone-client : load.% : load.%.templates load.%.files
-	$(MAKE) source=$(source_root)/grains      target=$(target_root)/$*/grains copy
-	$(MAKE) source=$(source_root)/grain-tests target=$(target_root)/$*/grain-tests copy
-	$(MAKE) source=$(source_root)/$*          target=$(target_root)/$*/$* copy
-	cp $(source_root)/$*.Dockerfile $(target_root)/$*
+	$(MAKE) source=$(source_root)-$(suffix)/grains      target=$(target_root)/$*-$(suffix)/grains copy
+	$(MAKE) source=$(source_root)-$(suffix)/grain-tests target=$(target_root)/$*-$(suffix)/grain-tests copy
+	$(MAKE) source=$(source_root)-$(suffix)/$*          target=$(target_root)/$*-$(suffix)/$* copy
+	cp $(source_root)-$(suffix)/$*.Dockerfile $(target_root)/$*-$(suffix)
 
 load.webapi-directclient : load.% : load.%.templates load.%.files
-	$(MAKE) source=$(source_root)/grains             target=$(target_root)/$*/grains copy
-	$(MAKE) source=$(source_root)/grain-controllers  target=$(target_root)/$*/grain-controllers copy
-	$(MAKE) source=$(source_root)/grain-tests        target=$(target_root)/$*/grain-tests copy
-	$(MAKE) source=$(source_root)/$*                 target=$(target_root)/$*/$* copy
-	- cp $(source_root)/$*.Dockerfile $(target_root)/$*
+	$(MAKE) source=$(source_root)-$(suffix)/grains             target=$(target_root)/$*-$(suffix)/grains copy
+	$(MAKE) source=$(source_root)-$(suffix)/grain-controllers  target=$(target_root)/$*-$(suffix)/grain-controllers copy
+	$(MAKE) source=$(source_root)-$(suffix)/grain-tests        target=$(target_root)/$*-$(suffix)/grain-tests copy
+	$(MAKE) source=$(source_root)-$(suffix)/$*                 target=$(target_root)/$*-$(suffix)/$* copy
+	- cp $(source_root)-$(suffix)/$*.Dockerfile $(target_root)/$*-$(suffix)
 
-load: load.standalone-silo load.standalone-client load.silo-and-client load.webapi-directclient
+load-all.% :
+	$(MAKE) suffix=$* load.standalone-silo
+	$(MAKE) suffix=$* load.standalone-client
+	$(MAKE) suffix=$* load.silo-and-client
+	$(MAKE) suffix=$* load.webapi-directclient
+
+load: load-all.csharp load-all.fsharp
+	@echo running
 
 clean.% :
 	- find $(target_root)/$* -name bin -exec rm -rf {} \;
@@ -55,3 +64,7 @@ clean.% :
 
 clean: clean.standalone-silo clean.standalone-client clean.silo-and-client clean.webapi-directclient
 	@echo Cleaned Template Directories
+
+clean-dev :
+	- find . -type d -name bin -exec rm -rf {} \;
+	- find . -type d -name obj -exec rm -rf {} \;

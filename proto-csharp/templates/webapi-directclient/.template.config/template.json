@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "identity": "Orleans.Contrib.UniversalSilo.WebapiDirectClient.CSharp",
+  "groupIdentity": "Orleans.Contrib.UniversalSilo.WebapiDirectClient",
+  "author": "John Azariah",
+  "classifications": [ "Orleans", "Contrib", "Universal Silo", "WebApi Direct Client" ],
+  "name": "Orleans: WebAPI Direct Client",
+  "description": "A solution co-hosted Orleans Silo and WebAPI endpoints",
+  "shortName": "orleans-webapi",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "sourceName": "webapi-directclient",
+  "preferNameDirectory": true
+}
