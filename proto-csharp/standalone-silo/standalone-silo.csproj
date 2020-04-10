@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <HighEntropyVA>true</HighEntropyVA>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
