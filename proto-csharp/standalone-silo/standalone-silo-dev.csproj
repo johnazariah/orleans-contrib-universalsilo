@@ -70,6 +70,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\universal-silo\universal-silo.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\grains\grains.csproj" />
   </ItemGroup>
 
