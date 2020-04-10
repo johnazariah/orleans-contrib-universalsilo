@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 ARG config=Release
 COPY . "/src"
-RUN dotnet publish "/src/standalone-silo/standalone-silo.csproj" -c ${config} -o /app
+RUN dotnet publish "/src/standalone-silo/standalone-silo.fsproj" -c ${config} -o /app
 
 # container to run the server from
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS release

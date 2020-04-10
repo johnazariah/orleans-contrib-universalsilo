@@ -8,7 +8,7 @@ target_root:=test/templates
 
 copy:
 	mkdir -p $(target)
-	tar -c --exclude bin --exclude obj --exclude .vs --exclude *-dev.csproj --exclude Properties --exclude *.user $(source) | tar -x --strip-components=2 -C $(target)
+	tar -c --exclude bin --exclude obj --exclude .vs --exclude *-dev.fsproj --exclude Properties --exclude *.user $(source) | tar -x --strip-components=2 -C $(target)
 	# cp -r $(source) $(target)
 
 load.%.templates :
