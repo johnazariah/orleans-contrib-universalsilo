@@ -17,7 +17,10 @@ type TestSiloConfigurator() = class
             siloBuilder
             |> (fun sb -> sb.AddMemoryGrainStorageAsDefault())
             |> (fun sb -> sb.UseInMemoryReminderService())
-            |> (fun sb -> sb.ConfigureApplicationParts(fun parts -> parts.AddFromApplicationBaseDirectory () |> ignore))
+            |> (fun sb -> sb.ConfigureApplicationParts(fun parts ->
+                parts.AddFromApplicationBaseDirectory()
+                |> (fun apm -> apm.WithCodeGeneration())
+                |> ignore))
             |> ignore
 end
 

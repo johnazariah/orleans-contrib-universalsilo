@@ -137,6 +137,7 @@ type SiloConfigurator (forceAzureClustering : bool) = class
     default __.ConfigureApplicationParts siloBuilder =
         siloBuilder.ConfigureApplicationParts(fun parts ->
             parts.AddFromApplicationBaseDirectory ()
+            |> (fun apm -> apm.WithCodeGeneration())
             |> ignore)
 
     abstract ConfigureSiloHost : HostBuilderContext -> ISiloBuilder -> unit

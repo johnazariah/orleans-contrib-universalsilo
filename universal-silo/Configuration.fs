@@ -115,7 +115,7 @@ module Extensions =
     let [<Extension>] inline GetAzureBlobStorageConnectionString (_this : IConfiguration) = _this.AzureBlobStorageConnectionString
 
     /// applies `_action` on `this` as an extension method. returns `_this` for further chaining.
-    let [<Extension>] inline ApplyConfiguration(_this : 'a, _action : Func<'a, 'a>) =
+    let [<Extension>] inline ApplyConfiguration (_this : 'a) (_action : Func<'a, 'a>) =
         _action.Invoke _this
 
     let [<Extension>] inline ApplyAppConfiguration(_this : IHostBuilder) =
@@ -127,7 +127,6 @@ module Extensions =
             |> ignore
 
         _this.ConfigureAppConfiguration configureAppConfiguration
-
 
 [<AutoOpen>]
 module Clustering =
