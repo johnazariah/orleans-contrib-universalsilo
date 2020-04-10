@@ -25,11 +25,11 @@ container_name:= $(acr)/$(project):$(image_tag)
 # .NET commands
 dotnet-clean:
 	- rm -rf out/$(project)
-	dotnet clean $(project)/$(project).csproj
+	dotnet clean $(project)/$(project).fsproj
 
 dotnet-build :
 	- rm -rf out/$(project)
-	dotnet publish $(project)/$(project).csproj -c $(config) -o out/$(project)
+	dotnet publish $(project)/$(project).fsproj -c $(config) -o out/$(project)
 	@echo Built DotNet projects
 
 dotnet-run : dotnet-build
