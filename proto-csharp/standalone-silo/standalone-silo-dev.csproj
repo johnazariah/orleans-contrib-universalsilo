@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <HighEntropyVA>true</HighEntropyVA>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
@@ -70,6 +66,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\universal-silo\universal-silo.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\grains\grains.csproj" />
   </ItemGroup>
 

@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <HighEntropyVA>true</HighEntropyVA>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
@@ -64,7 +60,6 @@
     <PackageReference Include="Microsoft.Orleans.Clustering.AzureStorage" Version="3.1.4" />
     <PackageReference Include="Microsoft.Orleans.Core" Version="3.1.4" />
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.1.4" />
-    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator" Version="3.1.4" />
     <PackageReference Include="Microsoft.Orleans.OrleansProviders" Version="3.1.4" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.1.4" />
     <PackageReference Include="Microsoft.Orleans.OrleansTelemetryConsumers.AI" Version="3.1.4" />
