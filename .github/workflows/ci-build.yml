@@ -15,9 +15,16 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.200
-    - name: Install dependencies
-      run: dotnet restore orleans-template.sln
-    - name: Build
-      run: dotnet build --configuration Release --no-restore orleans-template.sln
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal orleans-template.sln
+    - name: Install dependencies for C# solution
+      run: dotnet restore orleans-template-dev-csharp.sln
+    - name: Build C# solution
+      run: dotnet build --configuration Release --no-restore orleans-template-dev-csharp.sln
+    - name: Test C# solution
+      run: dotnet test --no-restore --verbosity normal orleans-template-dev-csharp.sln
+    - name: Install dependencies for F# solution
+      run: dotnet restore orleans-template-dev-fsharp.sln
+    - name: Build F# solution
+      run: dotnet build --configuration Release --no-restore orleans-template-dev-fsharp.sln
+    - name: Test F# solution
+      run: dotnet test --no-restore --verbosity normal orleans-template-dev-fsharp.sln
+ 
