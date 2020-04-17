@@ -46,8 +46,9 @@ build : build.csharp build.fsharp
 
 build.% :
 	@echo Building $* Solution
-	dotnet restore orleans-template-dev-$*.sln
+	dotnet restore            orleans-template-dev-$*.sln
 	dotnet build --no-restore orleans-template-dev-$*.sln
+	dotnet test  --no-build   orleans-template-dev-$*.sln
 
 templates-all : clean-templates pack-template-pack install-template-pack test-projects
 
@@ -155,7 +156,7 @@ build-proj.% :
 	- dotnet build scratch/$(suffix)/$*/SpiffyProject.sln
 
 test-proj.% :
-	- dotnet test scratch/$(suffix)/$*/SpiffyProject.sln
+	- dotnet test --no-build scratch/$(suffix)/$*/SpiffyProject.sln
 
 cleanup-proj.%:
 	- rm -rf scratch/$(suffix)/$*
