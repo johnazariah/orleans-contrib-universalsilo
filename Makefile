@@ -1,3 +1,5 @@
+LibraryVersion:=0.5.2
+
 source:=
 target:=
 
@@ -15,62 +17,6 @@ else
 	language=F\#
 endif
 
-copy:
-	mkdir -p $(target)
-	tar -c --exclude bin --exclude obj --exclude .vs --exclude *-dev.$(projsuffix) --exclude Properties --exclude *.user $(source) | tar -x --strip-components=2 -C $(target)
-
-# load.%.templates :
-# 	- cp -r $(source_root)-$(suffix)/templates/$*/.template.config $(template_root)/$*-$(suffix)
-
-# load.%.files :
-# 	- cp $(source_root)-$(suffix)/$*.sln $(template_root)/$*-$(suffix)
-# 	- cp $(source_root)-$(suffix)/$*.Makefile $(template_root)/$*-$(suffix)/Makefile
-
-# load.silo-and-client : load.% : load.%.templates load.%.files
-# 	$(MAKE) source=$(source_root)-$(suffix)/grains            target=$(template_root)/$*-$(suffix)/grains copy
-# 	$(MAKE) source=$(source_root)-$(suffix)/grain-tests       target=$(template_root)/$*-$(suffix)/grain-tests copy
-# 	$(MAKE) source=$(source_root)-$(suffix)/standalone-silo   target=$(template_root)/$*-$(suffix)/standalone-silo copy
-# 	$(MAKE) source=$(source_root)-$(suffix)/standalone-client target=$(template_root)/$*-$(suffix)/standalone-client copy
-# 	cp $(source_root)-$(suffix)/standalone-silo.Dockerfile   $(template_root)/$*-$(suffix)
-# 	cp $(source_root)-$(suffix)/standalone-silo.Makefile     $(template_root)/$*-$(suffix)
-# 	cp $(source_root)-$(suffix)/standalone-client.Dockerfile $(template_root)/$*-$(suffix)
-# 	cp $(source_root)-$(suffix)/standalone-client.Makefile   $(template_root)/$*-$(suffix)
-# 	cp $(source_root)-$(suffix)/$*.docker-compose.yml        $(template_root)/$*-$(suffix)/docker-compose.yml
-
-# load.webapi-directclient : load.% : load.%.templates load.%.files
-# 	$(MAKE) source=$(source_root)-$(suffix)/grains             target=$(template_root)/$*-$(suffix)/grains copy
-# 	$(MAKE) source=$(source_root)-$(suffix)/grain-controllers  target=$(template_root)/$*-$(suffix)/grain-controllers copy
-# 	$(MAKE) source=$(source_root)-$(suffix)/grain-tests        target=$(template_root)/$*-$(suffix)/grain-tests copy
-# 	$(MAKE) source=$(source_root)-$(suffix)/$*                 target=$(template_root)/$*-$(suffix)/$* copy
-# 	- cp $(source_root)-$(suffix)/$*.Dockerfile $(template_root)/$*-$(suffix)
-
-# load-all.% :
-# 	$(MAKE) suffix=$* load.standalone-silo
-# 	$(MAKE) suffix=$* load.standalone-client
-# 	$(MAKE) suffix=$* load.silo-and-client
-# 	$(MAKE) suffix=$* load.webapi-directclient
-
-# load: load-all.csharp load-all.fsharp
-# 	@echo running
-
-# clean.% :
-# 	- find $(template_root)/$* -name bin -exec rm -rf {} \;
-# 	- find $(template_root)/$* -name obj -exec rm -rf {} \;
-# 	- find $(template_root)/$* -name out -exec rm -rf {} \;
-# 	- find $(template_root)/$* -name .vs -exec rm -rf {} \;
-# 	- find $(template_root)/$* -name Properties -exec rm -rf {} \;
-# 	- find $(template_root)/$* -name *.user -exec rm -rf {} \;
-# 	- find $(template_root)/$* -name Makefile -exec rm -rf {} \;
-# 	- find $(template_root)/$* -name $*.Dockerfile -exec rm -rf {} \;
-# 	- find $(template_root)/$* -name $*.sln -exec rm -rf {} \;
-
-# clean: clean.standalone-silo clean.standalone-client clean.silo-and-client clean.webapi-directclient
-# 	@echo Cleaned Template Directories
-
-# clean-dev :
-# 	- find . -type d -name bin -exec rm -rf {} \;
-# 	- find . -type d -name obj -exec rm -rf {} \;
-
 docker-stop :
 	@echo Stopping all  containers
 	- docker stop $(shell docker ps -aq)
@@ -84,9 +30,58 @@ docker-clean : docker-kill
 	@echo Pruning all images
 	- docker image prune -af
 
-copy-templates.% :
-	@echo Copying Templates For $* [$(suffix)]
-	cp -r $(source_root)-$(suffix)/templates/$*/.template.config $(template_root)/$*-$(suffix)
+all : clean build templates-all
+
+clean : clean-packages clean-templates
+	@echo Done cleaning
+
+clean-templates :
+	- rm -rf test scratch
+
+clean-packages :
+	- rm *.nupkg
+
+build : build.csharp build.fsharp
+	@echo Done Building Projects
+
+build.% :
+	@echo Building $* Solution
+	dotnet restore orleans-template-dev-$*.sln
+	dotnet build --no-restore orleans-template-dev-$*.sln
+
+templates-all : clean-templates pack-template-pack install-template-pack test-projects
+
+pack-template-pack : copy-template-pack
+	$(MAKE) project_path=$(target_root)/Orleans.Contrib.UniversalSilo.Templates.csproj package_name=Orleans.Contrib.UniversalSilo.Templates package_version=$(LibraryVersion) pack
+
+copy-template-pack : copy-template-pack.csharp #copy-template-pack.fsharp
+	cp Orleans.Contrib.UniversalSilo.Templates.csproj $(target_root)
+	@echo Copied Template Pack
+
+copy-template-pack.% :
+	$(MAKE) suffix=$* copy-template.standalone-silo copy-template.standalone-client copy-template.silo-and-client copy-template.webapi-directclient
+
+copy-template.standalone-silo copy-template.standalone-client : copy-template.% : copy-common.% copy-project.%
+	@echo Built Template Folder For $* [$(suffix)]
+	@echo
+
+copy-template.webapi-directclient : copy-template.% : copy-common.% copy-grain-controllers.% copy-project.%
+	@echo Built Template Folder For $* [$(suffix)]
+	@echo
+
+copy-template.silo-and-client : copy-template.% : copy-common.%
+	$(MAKE) source=$(source_root)-$(suffix)/standalone-silo   target=$(template_root)/$*-$(suffix)/standalone-silo copy
+	$(MAKE) source=$(source_root)-$(suffix)/standalone-client target=$(template_root)/$*-$(suffix)/standalone-client copy
+	sed -e "s/<ProjectReference.*universal-silo.fsproj/<PackageReference Version=\"$(LibraryVersion)\" Include=\"Orleans.Contrib.UniversalSilo/g" $(source_root)-$(suffix)/standalone-silo/standalone-silo-dev.$(projsuffix) > $(template_root)/$*-$(suffix)/standalone-silo/standalone-silo.$(projsuffix)
+	sed -e "s/<ProjectReference.*universal-silo.fsproj/<PackageReference Version=\"$(LibraryVersion)\" Include=\"Orleans.Contrib.UniversalSilo/g" $(source_root)-$(suffix)/standalone-client/standalone-client-dev.$(projsuffix) > $(template_root)/$*-$(suffix)/standalone-client/standalone-client.$(projsuffix)
+	cp $(source_root)-$(suffix)/standalone-silo.Dockerfile   $(template_root)/$*-$(suffix)
+	cp $(source_root)-$(suffix)/standalone-silo.Makefile     $(template_root)/$*-$(suffix)
+	cp $(source_root)-$(suffix)/standalone-client.Dockerfile $(template_root)/$*-$(suffix)
+	cp $(source_root)-$(suffix)/standalone-client.Makefile   $(template_root)/$*-$(suffix)
+	cp $(source_root)-$(suffix)/$*.docker-compose.yml        $(template_root)/$*-$(suffix)/docker-compose.yml
+
+copy-common.% : copy-grains.% copy-grain-tests.% copy-templates.% copy-makefile.% copy-dockerfile.% copy-tyefile.% copy-solution.%
+	@echo Copied Common Components For $* [$(suffix)]
 	@echo
 
 copy-grains.% :
@@ -97,22 +92,38 @@ copy-grains.% :
 copy-grain-tests.% :
 	@echo Copying Grain Tests Project For $* [$(suffix)]
 	$(MAKE) source=$(source_root)-$(suffix)/grain-tests target=$(template_root)/$*-$(suffix)/grain-tests copy
+	sed -e "s/<ProjectReference.*universal-silo.fsproj/<PackageReference Version=\"$(LibraryVersion)\" Include=\"Orleans.Contrib.UniversalSilo/g" $(source_root)-$(suffix)/grain-tests/grain-tests-dev.$(projsuffix) > $(template_root)/$*-$(suffix)/grain-tests/grain-tests.$(projsuffix)
+	@echo
+
+copy-templates.% :
+	@echo Copying Templates For $* [$(suffix)]
+	cp -r $(source_root)-$(suffix)/_templates/$*/.template.config $(template_root)/$*-$(suffix)
+	@echo
+
+copy-grain-controllers.% :
+	@echo Copying Grain Controllers Project For $* [$(suffix)]
+	$(MAKE) source=$(source_root)-$(suffix)/grain-controllers target=$(template_root)/$*-$(suffix)/grain-controllers copy
 	@echo
 
 copy-project.% :
 	@echo Copying Project For $* [$(suffix)]
 	$(MAKE) source=$(source_root)-$(suffix)/$* target=$(template_root)/$*-$(suffix)/Template copy
-	mv $(template_root)/$*-$(suffix)/Template/$*.$(projsuffix) $(template_root)/$*-$(suffix)/Template/Template.$(projsuffix)
+	sed -e "s/<ProjectReference.*universal-silo.fsproj/<PackageReference Version=\"$(LibraryVersion)\" Include=\"Orleans.Contrib.UniversalSilo/g" $(source_root)-$(suffix)/$*/$*-dev.$(projsuffix) > $(template_root)/$*-$(suffix)/Template/Template.$(projsuffix)
 	@echo
 
 copy-makefile.% :
 	@echo Copying Makefile For $* [$(suffix)]
-	cp $(source_root)-$(suffix)/$*.Makefile   $(template_root)/$*-$(suffix)/Makefile
+	- sed -e "s/$*/Template/g" $(source_root)-$(suffix)/$*.Makefile > $(template_root)/$*-$(suffix)/Makefile
+	@echo
+
+copy-tyefile.% :
+	@echo Copying Tye File For $* [$(suffix)]
+	- sed -e "s/$*/Template/g" $(source_root)-$(suffix)/$*.tye > $(template_root)/$*-$(suffix)/tye.yaml
 	@echo
 
 copy-dockerfile.% :
 	@echo Copying Dockerfile For $* [$(suffix)]
-	- cp $(source_root)-$(suffix)/$*.Dockerfile $(template_root)/$*-$(suffix)/Dockerfile
+	- sed -e "s/$*/Template/g" $(source_root)-$(suffix)/$*.Dockerfile > $(template_root)/$*-$(suffix)/Template.Dockerfile
 	@echo
 
 copy-solution.% :
@@ -121,77 +132,48 @@ copy-solution.% :
 	mv $(template_root)/$*-$(suffix)/$*.sln $(template_root)/$*-$(suffix)/Template.sln
 	@echo
 
-copy-common.% : copy-grains.% copy-grain-tests.% copy-templates.% copy-makefile.% copy-dockerfile.% copy-solution.%
-	@echo Copied Common Components For $* [$(suffix)]
-	@echo
-
-copy-template.standalone-silo copy-template.standalone-client : copy-template.% : copy-common.% copy-project.%
-	@echo Built Template Folder For $* [$(suffix)]
-	@echo
-
-copy-template.silo-and-client : copy-template.% : copy-common.%
-	$(MAKE) source=$(source_root)-$(suffix)/standalone-silo   target=$(template_root)/$*-$(suffix)/standalone-silo copy
-	$(MAKE) source=$(source_root)-$(suffix)/standalone-client target=$(template_root)/$*-$(suffix)/standalone-client copy
-	cp $(source_root)-$(suffix)/standalone-silo.Dockerfile   $(template_root)/$*-$(suffix)
-	cp $(source_root)-$(suffix)/standalone-silo.Makefile     $(template_root)/$*-$(suffix)
-	cp $(source_root)-$(suffix)/standalone-client.Dockerfile $(template_root)/$*-$(suffix)
-	cp $(source_root)-$(suffix)/standalone-client.Makefile   $(template_root)/$*-$(suffix)
-	cp $(source_root)-$(suffix)/$*.docker-compose.yml        $(template_root)/$*-$(suffix)/docker-compose.yml
-
-copy-template-pack.% :
-	$(MAKE) suffix=$* copy-template.standalone-silo
-	$(MAKE) suffix=$* copy-template.standalone-client
-	$(MAKE) suffix=$* copy-template.silo-and-client
-	# $(MAKE) suffix=$* copy-template.webapi-directclient
-
-copy-template-pack : copy-template-pack.csharp copy-template-pack.fsharp
-	cp Orleans.Contrib.UniversalSilo.Templates.csproj $(target_root)
-	@echo Copied Template Pack
-
-pack-template-pack : copy-template-pack
-	dotnet build -c Release $(target_root)/Orleans.Contrib.UniversalSilo.Templates.csproj
-	dotnet pack --no-build -c Release $(target_root)/Orleans.Contrib.UniversalSilo.Templates.csproj -p:PackageId=Orleans.Contrib.UniversalSilo.Templates -o .
-	@echo Built and Packed Template Folders
-
-push-template-pack : pack-template-pack
-	dotnet nuget push ./Orleans.Contrib.UniversalSilo.Templates*.nupkg -s https://api.nuget.org/v3/index.json -k $${{secrets.NUGET_API_KEY}}
+copy:
+	mkdir -p $(target)
+	tar -c --exclude bin --exclude obj --exclude .vs --exclude *-dev.$(projsuffix) --exclude Properties --exclude *.user $(source) | tar -x --strip-components=2 -C $(target)
 
 install-template-pack :
-	dotnet new -i Orleans.Contrib.UniversalSilo.Templates*.nupkg
+	dotnet new -i Orleans.Contrib.UniversalSilo.Templates.$(LibraryVersion).nupkg
 
-create-proj.% :
-	dotnet new orleans-$* -lang $(language) -n SpiffyProject -o scratch/$*/$(suffix)
-
-build-proj.% :
-	dotnet build scratch/$*/$(suffix)/SpiffyProject
-
-test-proj.% :
-	dotnet test scratch/$*/$(suffix)/SpiffyProject
-
-cleanup-proj.%:
-	rm -rf scratch/$*/$(suffix)/SpiffyProject
-
-test-project.% : create-proj.% build-proj.% test-proj.% cleanup-proj.%
-	@echo Tested Project $* [$(suffix)]
-
-test-projects.% :
-	- $(MAKE) suffix=$* test-project.silo test-project.client test-project.silo-and-client test-project.webapi-directclient
-
-test-projects : test-projects.fsharp test-projects.csharp
+test-projects : test-projects.csharp #test-projects.fsharp
 	@echo Created Projects
 
+test-projects.% :
+	- $(MAKE) suffix=$* test-project.silo test-project.client test-project.silo-and-client test-project.webapi
+
+test-project.% : create-proj.% build-proj.% test-proj.%
+	@echo Tested Project $* [$(suffix)]
+
+create-proj.% :
+	- dotnet new orleans-$* -lang $(language) -n SpiffyProject -o scratch/$(suffix)/$*
+
+build-proj.% :
+	- dotnet build scratch/$(suffix)/$*/SpiffyProject.sln
+
+test-proj.% :
+	- dotnet test scratch/$(suffix)/$*/SpiffyProject.sln
+
+cleanup-proj.%:
+	- rm -rf scratch/$(suffix)/$*
+
 pack-library :
-	dotnet build -c Release universal-silo/universal-silo.fsproj
-	dotnet pack --no-build -c Release universal-silo/universal-silo.fsproj -p:PackageId=Orleans.Contrib.UniversalSilo -o .
-	@echo Built and Packed Library
+	$(MAKE) project_path=universal-silo/universal-silo.fsproj package_name=Orleans.Contrib.UniversalSilo package_version=$(LibraryVersion) pack
+
+push-template-pack : pack-template-pack
+	$(MAKE)  package_name=Orleans.Contrib.UniversalSilo.Templates package_version=$(LibraryVersion) push
 
 push-library : pack-library
-	dotnet nuget push ./Orleans.Contrib.UniversalSilo*.nupkg -s https://api.nuget.org/v3/index.json -k $${{secrets.NUGET_API_KEY}}
+	$(MAKE) package_name=Orleans.Contrib.UniversalSilo package_version=$(LibraryVersion) push
 
-build.% :
-	@echo Building $* Solution
-	dotnet restore orleans-template-dev-$*.sln
-	dotnet build --no-restore orleans-template-dev-$*.sln
+pack :
+	dotnet build -c Release $(project_path)
+	dotnet pack --no-build -c Release $(project_path) -p:PackageId=$(package_name) -p:PackageVersion=$(package_version) -o .
+	@echo Built and Packed Library
 
-build : build.csharp  build.fsharp
-	@echo Done Building Projects
+push :
+	dotnet nuget push ./$(package_name).$(package_version).nupkg -s https://api.nuget.org/v3/index.json -k $${{secrets.NUGET_API_KEY}}
+	@echo Pushed Library to Nuget
