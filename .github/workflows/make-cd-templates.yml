@@ -1,13 +1,6 @@
 name: Build & Push UniversalSilo Templates Package
 on:
   push:
-    branches:
-      - master
-    tags:
-      - 'tpl*'
-  pull_request:
-    branches:
-      - master
     tags:
       - 'tpl*'
 jobs:

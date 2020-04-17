@@ -2,13 +2,6 @@ name: Build & Push UniversalSilo Nuget Package
 
 on:
   push:
-    branches:
-      - master
-    tags:
-      - 'lib*'
-  pull_request:
-    branches:
-      - master
     tags:
       - 'lib*'
 jobs:
