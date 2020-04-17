@@ -1,0 +1,12 @@
+.*
+*.cmd
+*.ps1
+*.sln
+docker-compose.yml
+clustering.json
+persistence.json
+**/bin/
+**/obj/
+**/out/
+**/node_modules/
+**/deploy/

@@ -215,20 +215,6 @@ src/SetupTestScriptOutput.txt
 .ionide/
 out/
 
-
-#generated parameter files
-.setup/parameters.json
-regcred.yaml
-regcred.*.yaml
-azure-storage-config.yaml
-azure-storage-config.*.yaml
-cosmosdb-config.yaml
-persistence.json
-clustering.json
-*.dev.json
-ingress.*.yaml
-tls-secret.*.yaml
-
 #complied gui assets
 deploy/
 
@@ -240,3 +226,7 @@ deploy/
 #
 **/tokencache.bin
 out.csv
+
+# Orleans UniversalSilo stuff
+persistence.json
+clustering.json

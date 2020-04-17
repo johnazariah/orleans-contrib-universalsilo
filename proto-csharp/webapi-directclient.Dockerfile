@@ -2,12 +2,12 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 ARG config=Release
 COPY . "/src"
-RUN dotnet publish "/src/standalone-silo/standalone-silo.csproj" -c ${config} -o /app
+RUN dotnet publish "/src/webapi-directclient/webapi-directclient.csproj" -c ${config} -o /app
 
 # container to run the server from
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS release
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS release
 WORKDIR /app
-EXPOSE 30000 11111
+EXPOSE 30000 11111 8080 80
 
 # set up variables to allow the docker image to run by default with Azure clustering and Azure persistence on Azure Storage Emulator on the host
 ENV ENV_CLUSTER_MODE            "Azure"
@@ -18,4 +18,4 @@ ENV ENV_DEFAULT_PERSISTENCE_AZURE_BLOB  "DefaultEndpointsProtocol=http;AccountNa
 
 COPY --from=build /app .
 
-ENTRYPOINT ["dotnet", "standalone-silo.dll"]
+ENTRYPOINT ["dotnet", "webapi-directclient.dll"]

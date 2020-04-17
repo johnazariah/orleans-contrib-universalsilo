@@ -3,10 +3,11 @@
 # We'll use some Unix commands here: install git bash with all Unix commands on the PATH
 # We'll need `make`: run `choco install make`
 
-SHELL = CMD
+lc = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(subst G,g,$(subst H,h,$(subst I,i,$(subst J,j,$(subst K,k,$(subst L,l,$(subst M,m,$(subst N,n,$(subst O,o,$(subst P,p,$(subst Q,q,$(subst R,r,$(subst S,s,$(subst T,t,$(subst U,u,$(subst V,v,$(subst W,w,$(subst X,x,$(subst Y,y,$(subst Z,z,$1))))))))))))))))))))))))))
 
 # project name
 project:=standalone-client
+project-lc:=$(call lc,$(project))
 
 # project configuration
 config:=Debug
@@ -20,7 +21,7 @@ git_branch = $(subst /,--,$(shell git rev-parse --abbrev-ref HEAD))
 git_latest_hash = $(shell git log -1 --pretty=format:"%h")
 image_tag = $(git_branch).$(git_latest_hash)
 
-container_name:= $(acr)/$(project):$(image_tag)
+container_name:= $(acr)/$(project-lc):$(image_tag)
 
 # .NET commands
 dotnet-clean:

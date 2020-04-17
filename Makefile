@@ -9,6 +9,8 @@ suffix:=
 source_root:=proto
 target_root:=test
 template_root:=$(target_root)/templates
+scratch_root:=scratch
+scratch_proj:=Cornflake
 
 ifeq ($(suffix),csharp)
 	projsuffix=csproj
@@ -37,7 +39,7 @@ clean : clean-packages clean-templates
 	@echo Done cleaning
 
 clean-templates :
-	- rm -rf test scratch
+	- rm -rf $(target_root) $(scratch_root)
 
 clean-packages :
 	- rm *.nupkg
@@ -56,7 +58,7 @@ templates-all : clean-templates pack-template-pack install-template-pack test-pr
 pack-template-pack : copy-template-pack
 	$(MAKE) project_path=$(target_root)/Orleans.Contrib.UniversalSilo.Templates.csproj package_name=Orleans.Contrib.UniversalSilo.Templates package_version=$(LibraryVersion) pack
 
-copy-template-pack : copy-template-pack.csharp #copy-template-pack.fsharp
+copy-template-pack : copy-template-pack.csharp copy-template-pack.fsharp
 	cp Orleans.Contrib.UniversalSilo.Templates.csproj $(target_root)
 	@echo Copied Template Pack
 
@@ -68,6 +70,7 @@ copy-template.standalone-silo copy-template.standalone-client : copy-template.% 
 	@echo
 
 copy-template.webapi-directclient : copy-template.% : copy-common.% copy-grain-controllers.% copy-project.%
+	cp $(source_root)-$(suffix)/$*.docker-compose.yml        $(template_root)/$*-$(suffix)/docker-compose.yml
 	@echo Built Template Folder For $* [$(suffix)]
 	@echo
 
@@ -82,7 +85,7 @@ copy-template.silo-and-client : copy-template.% : copy-common.%
 	cp $(source_root)-$(suffix)/standalone-client.Makefile   $(template_root)/$*-$(suffix)
 	cp $(source_root)-$(suffix)/$*.docker-compose.yml        $(template_root)/$*-$(suffix)/docker-compose.yml
 
-copy-common.% : copy-grains.% copy-grain-tests.% copy-templates.% copy-makefile.% copy-dockerfile.% copy-tyefile.% copy-solution.%
+copy-common.% : copy-grains.% copy-grain-tests.% copy-templates.% copy-makefile.% copy-dockerfile.% copy-tyefile.% copy-solution.% copy-ignores.%
 	@echo Copied Common Components For $* [$(suffix)]
 	@echo
 
@@ -128,6 +131,12 @@ copy-dockerfile.% :
 	- sed -e "s/$*/Template/g" $(source_root)-$(suffix)/$*.Dockerfile > $(template_root)/$*-$(suffix)/Template.Dockerfile
 	@echo
 
+copy-ignores.% :
+	@echo Copying .gitignore and .dockerignore For $* [$(suffix)]
+	- cp .gitignore    $(template_root)/$*-$(suffix)/.gitignore
+	- cp .dockerignore $(template_root)/$*-$(suffix)/.dockerignore
+	@echo
+
 copy-solution.% :
 	@echo Copying Solution For $* [$(suffix)]
 	cp $(source_root)-$(suffix)/$*.sln $(template_root)/$*-$(suffix)
@@ -151,16 +160,16 @@ test-project.% : create-proj.% build-proj.% test-proj.%
 	@echo Tested Project $* [$(suffix)]
 
 create-proj.% :
-	- dotnet new orleans-$* -lang $(language) -n SpiffyProject -o scratch/$(suffix)/$*
+	- dotnet new orleans-$* -lang $(language) -n $(scratch_proj) -o scratch/$(suffix)/$*
 
 build-proj.% :
-	- dotnet build scratch/$(suffix)/$*/SpiffyProject.sln
+	- dotnet build $(scratch_root)/$(suffix)/$*/$(scratch_proj).sln
 
 test-proj.% :
-	- dotnet test --no-build scratch/$(suffix)/$*/SpiffyProject.sln
+	- dotnet test --no-build $(scratch_root)/$(suffix)/$*/$(scratch_proj).sln
 
 cleanup-proj.%:
-	- rm -rf scratch/$(suffix)/$*
+	- rm -rf $(scratch_root)/$(suffix)/$*
 
 pack-library :
 	$(MAKE) project_path=universal-silo/universal-silo.fsproj package_name=Orleans.Contrib.UniversalSilo package_version=$(LibraryVersion) pack
@@ -173,7 +182,7 @@ push-library : pack-library
 
 pack :
 	dotnet build -c Release $(project_path)
-	dotnet pack --no-build -c Release $(project_path) -p:PackageId=$(package_name) -p:PackageVersion=$(package_version) -o .
+	dotnet pack  --no-build -c Release $(project_path) -p:PackageId=$(package_name) -p:PackageVersion=$(package_version) -o .
 	@echo Built and Packed Library
 
 push :

@@ -8,7 +8,7 @@ SHELL = CMD
 lc = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(subst G,g,$(subst H,h,$(subst I,i,$(subst J,j,$(subst K,k,$(subst L,l,$(subst M,m,$(subst N,n,$(subst O,o,$(subst P,p,$(subst Q,q,$(subst R,r,$(subst S,s,$(subst T,t,$(subst U,u,$(subst V,v,$(subst W,w,$(subst X,x,$(subst Y,y,$(subst Z,z,$1))))))))))))))))))))))))))
 
 # project name
-project:=standalone-silo
+project:=webapi-directclient
 project-lc:=$(call lc,$(project))
 
 # project configuration
@@ -28,11 +28,11 @@ container_name:= $(acr)/$(project-lc):$(image_tag)
 # .NET commands
 dotnet-clean:
 	- rm -rf out/$(project)
-	dotnet clean $(project)/$(project).fsproj
+	dotnet clean $(project)/$(project).csproj
 
 dotnet-build :
 	- rm -rf out/$(project)
-	dotnet publish $(project)/$(project).fsproj -c $(config) -o out/$(project)
+	dotnet publish $(project)/$(project).csproj -c $(config) -o out/$(project)
 	@echo Built DotNet projects
 
 dotnet-run : dotnet-build
@@ -53,6 +53,7 @@ docker-run :
 	'docker','run','--rm',\
 	'-p','30000:30000',\
 	'-p','11111:11111',\
+	'-p','5000:80',\
 	'-p','8080:8080',\
 	'$(container_name)'
 
@@ -62,6 +63,7 @@ docker-run-hostlocal :
 	'-e','ENV_CLUSTER_MODE=HostLocal',\
 	'-p','30000:30000',\
 	'-p','11111:11111',\
+	'-p','5000:80',\
 	'-p','8080:8080',\
 	'$(container_name)'
 

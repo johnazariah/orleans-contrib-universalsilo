@@ -3,9 +3,8 @@ name: Template
 services:
   - name: silo
     replicas: 3
-    project: Template/Template.csproj
+    project: standalone-silo/standalone-silo.csproj
     bindings:
     - containerPort: 11111
     - containerPort: 30000
     - port: 8080
-    - port: 5000
