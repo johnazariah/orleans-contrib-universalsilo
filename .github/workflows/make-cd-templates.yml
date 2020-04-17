@@ -11,4 +11,4 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
     - name: Build, Pack and Push Templates
-      run: make LibraryVersion=${GITHUB_REF##*/tpl} push-template-pack
+      run: make LibraryVersion=${GITHUB_REF##*/tpl} NugetApiKey=${{secrets.NUGET_API_KEY}} push-template-pack

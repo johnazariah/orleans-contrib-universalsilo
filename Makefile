@@ -1,4 +1,5 @@
 LibraryVersion:=0.5.2
+NugetApiKey:=
 
 source:=
 target:=
@@ -176,5 +177,5 @@ pack :
 	@echo Built and Packed Library
 
 push :
-	dotnet nuget push ./$(package_name).$(package_version).nupkg -s https://api.nuget.org/v3/index.json -k $${{secrets.NUGET_API_KEY}}
+	dotnet nuget push ./$(package_name).$(package_version).nupkg -s https://api.nuget.org/v3/index.json -k $(NugetApiKey)
 	@echo Pushed Library to Nuget
