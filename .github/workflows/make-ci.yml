@@ -1,4 +1,4 @@
-name: [Make] CI
+name: Make-Based CI 
 
 on: [ push, pull_request ]
 
