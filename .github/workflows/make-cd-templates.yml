@@ -1,0 +1,21 @@
+name: Build & Push UniversalSilo Templates Package
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'tpl*'
+  pull_request:
+    branches:
+      - master
+    tags:
+      - 'tpl*'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+    - name: Build, Pack and Push Templates
+      run: make LibraryVersion=${GITHUB_REF##*/tpl} push-template-pack
