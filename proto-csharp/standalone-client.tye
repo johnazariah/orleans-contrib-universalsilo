@@ -1,0 +1,5 @@
+name: Template
+
+services:
+  - name: client
+    project: standalone-client/standalone-client.csproj
