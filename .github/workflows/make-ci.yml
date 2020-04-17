@@ -1,0 +1,16 @@
+name: [Make] CI
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+    - uses: actions/checkout@v2
+    - name: build-csharp
+      run: make build.csharp
+    - name: build-fsharp
+      run: make build.fsharp
