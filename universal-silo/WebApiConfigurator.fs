@@ -15,10 +15,11 @@ open Microsoft.Extensions.Configuration
 
 [<AbstractClass>]
 type WebApiConfigurator (apiInfo : OpenApiInfo) = class
-    member val Configuration : IConfiguration = null with get, set
+    let mutable configuration : IConfiguration = null
+    member val public Configuration = configuration
 
     member this.SetConfigurationObject (hostBuilderContext : HostBuilderContext) =
-        this.Configuration <- hostBuilderContext.Configuration
+        configuration <- hostBuilderContext.Configuration
 
     abstract AddSwaggerGen : IServiceCollection -> IServiceCollection
     default __.AddSwaggerGen services =

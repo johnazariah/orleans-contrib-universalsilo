@@ -15,7 +15,7 @@ type SiloConfigurator (forceAzureClustering : bool) = class
     let loggerFactory = LoggerFactory.Create(fun builder -> builder.AddConsole () |> ignore)
     let logger = loggerFactory.CreateLogger("SiloConfigurator")
 
-    member val Logger = logger
+    member val public Logger = logger
 
     abstract ConfigureServices : ISiloBuilder -> ISiloBuilder
     default __.ConfigureServices siloBuilder =
