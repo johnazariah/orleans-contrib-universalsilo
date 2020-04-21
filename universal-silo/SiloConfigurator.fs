@@ -15,6 +15,8 @@ type SiloConfigurator (forceAzureClustering : bool) = class
     let loggerFactory = LoggerFactory.Create(fun builder -> builder.AddConsole () |> ignore)
     let logger = loggerFactory.CreateLogger("SiloConfigurator")
 
+    member val public Logger = logger
+
     abstract ConfigureServices : ISiloBuilder -> ISiloBuilder
     default __.ConfigureServices siloBuilder =
         siloBuilder
@@ -68,7 +70,7 @@ type SiloConfigurator (forceAzureClustering : bool) = class
         |> configureEndpoints
 
     abstract ConfigureStorageProvider : IConfiguration -> StorageProviderConfiguration -> ISiloBuilder -> ISiloBuilder
-    default __.ConfigureStorageProvider _ storageProviderConfiguration siloBuilder =
+    default __.ConfigureStorageProvider configuration storageProviderConfiguration siloBuilder =
         try
             match storageProviderConfiguration.PersistenceMode with
             | PersistenceModes.AzureTable ->
@@ -86,7 +88,7 @@ type SiloConfigurator (forceAzureClustering : bool) = class
                 storageProviderConfiguration.ConnectionString)
 
     abstract ConfigureReminderService : IConfiguration -> StorageProviderConfiguration -> ISiloBuilder -> ISiloBuilder
-    default __.ConfigureReminderService _ storageProviderConfiguration siloBuilder =
+    default __.ConfigureReminderService configuration storageProviderConfiguration siloBuilder =
         try
             match storageProviderConfiguration.PersistenceMode with
             | PersistenceModes.AzureTable | PersistenceModes.AzureBlob ->
