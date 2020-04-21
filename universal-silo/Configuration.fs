@@ -130,9 +130,8 @@ module Extensions =
 
 [<AutoOpen>]
 module Clustering =
-    type internal ClusteringConfigurationObject() = class
+    type ClusteringConfigurationObject() = class
         member val ClusteringMode = ClusteringModes.HostLocal with get, set
-        member val RunInLocalEnvironment = false with get, set
     end
 
     type ClusteringConfiguration (Logger : ILogger, Configuration : IConfiguration) = class
@@ -142,7 +141,6 @@ module Clustering =
                 let localConfigurationFile = Configuration.GetSection (nameof(ClusteringConfiguration))
                 if localConfigurationFile.Exists () then
                     localConfigurationFile.Bind(localConfiguration)
-                    localConfiguration.RunInLocalEnvironment <- true
                     Logger.LogInformation("Deducing that we are running locally because a clustering configuration was found.")
                 else
                     localConfiguration.ClusteringMode <- Configuration.ClusteringMode;
@@ -150,7 +148,6 @@ module Clustering =
 
                     if (localConfiguration.ClusteringMode = ClusteringModes.HostLocal) then
                         if (File.Exists("/.dockerenv")) then
-                            localConfiguration.ClusteringMode <- ClusteringModes.Docker
                             Logger.LogInformation("Deduced we are running within a Docker environment. Resetting ClusteringMode from HostLocal to Docker")
 
                         if (Directory.Exists("/var/run/secrets/kubernetes.io")) then
@@ -158,13 +155,9 @@ module Clustering =
                             Logger.LogInformation("Deduced we are running within a Kubernetes environment. Resetting ClusteringMode from HostLocal to Kubernetes")
             finally
                 Logger.LogInformation("Finally configuring with clustering mode [{ClusteringMode}]",        localConfiguration.ClusteringMode)
-                Logger.LogInformation("Finally setting up to run in local dev environment [{LocalDevelopmentEnvironment}]", localConfiguration.RunInLocalEnvironment)
 
         /// Returns the ClusteringMode detected from any specified configuration, defaulting to ClusteringModes.HostLocal
         member val ClusteringMode = localConfiguration.ClusteringMode with get, set
-
-        /// True if a local configuration file was specified - helpful for local Docker and K8s environments. False otherwise.
-        member val RunInLocalEnvironment = localConfiguration.RunInLocalEnvironment with get, set
 
         /// Returns the IP Address the Silo declares that it is hosted at
         /// If the clustering configuration is set to ClusteringModes.Docker container, a stable, non-loopback IP address is detected and used
