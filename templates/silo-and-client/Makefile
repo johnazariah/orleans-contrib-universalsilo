@@ -3,8 +3,6 @@
 # We'll use some Unix commands here: install git bash with all Unix commands on the PATH
 # We'll need `make`: run `choco install make`
 
-SHELL = CMD
-
 # project name
 silo=Template.Silo
 client=Template.Client
