@@ -7,19 +7,13 @@ on:
     branches: [ master ]
 
 jobs:
-  build-csharp:
+  build-and-test-solutions-and-templates:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
-    - name: build-csharp
-      run: make build.csharp
-  build-fsharp:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-    - name: build-fsharp
-      run: make build.fsharp
+    - name: build-and-test-solutions
+      run: make build
+    - name: verify-templates
+      run: make templates-all
