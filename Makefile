@@ -150,11 +150,10 @@ copy:
 	tar -c --exclude bin --exclude obj --exclude .vs --exclude Properties --exclude *.user $(source) | tar -x --strip-components=2 -C $(target)
 
 replace-pattern :
-	if [ -a $(output_root)/$(template)-$(suffix)/$(replace_in_file) ] ;\
-	then \
-		sed -e "s/$(replace_pattern)/$(replacement_pattern)/g" $(output_root)/$(template)-$(suffix)/$(replace_in_file) > $(output_root)/$(template)-$(suffix)/$(replace_in_file).tmp ; \
-		mv $(output_root)/$(template)-$(suffix)/$(replace_in_file).tmp $(output_root)/$(template)-$(suffix)/$(replace_in_file) ; \
-	fi ;
+ifneq ("$(wildcard $(output_root)/$(template)-$(suffix)/$(replace_in_file))", "")
+	sed -e "s/$(replace_pattern)/$(replacement_pattern)/g" $(output_root)/$(template)-$(suffix)/$(replace_in_file) > $(output_root)/$(template)-$(suffix)/$(replace_in_file).tmp
+	mv $(output_root)/$(template)-$(suffix)/$(replace_in_file).tmp $(output_root)/$(template)-$(suffix)/$(replace_in_file)
+endif
 
 replace-project-reference-with-nuget-reference :
 	- sed -e "s/<ProjectReference.*universal-silo.fsproj\"/<PackageReference Include=\"Orleans.Contrib.UniversalSilo\" Version=\"$(LibraryVersion)\"/g" $(proto_root)-$(suffix)/$(src_project_file) > $(output_root)/$(dest_project_file)
