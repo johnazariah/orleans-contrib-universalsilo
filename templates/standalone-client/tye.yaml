@@ -1,0 +1,5 @@
+name: Template
+
+services:
+  - name: client
+    project: Template/Template._PROJ_SUFFIX_

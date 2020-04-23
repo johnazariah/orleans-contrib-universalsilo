@@ -230,3 +230,4 @@ out.csv
 # Orleans UniversalSilo stuff
 persistence.json
 clustering.json
+scratch/

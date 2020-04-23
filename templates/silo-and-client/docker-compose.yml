@@ -1,0 +1,14 @@
+version: "3"
+services:
+  silo:
+    build:
+        context: .\
+        dockerfile: Template.Silo.Dockerfile
+    ports:
+        - "11111:11111"
+        - "30000:30000"
+        - "8080:8080"
+  client:
+    build:
+        context: .\
+        dockerfile: Template.Client.Dockerfile
