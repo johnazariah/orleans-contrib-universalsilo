@@ -31,7 +31,10 @@ init :
 	git commit -m "Initial commit of Template"
 
 # .NET commands
-dotnet-build dotnet-clean dotnet-run dotnet-test:
+dotnet-build dotnet-clean dotnet-test
+	$(MAKE) -f $(silo).Makefile   $@
+
+dotnet-run :
 	$(MAKE) -f $(silo).Makefile   $@
 	$(MAKE) -f $(client).Makefile $@
 
