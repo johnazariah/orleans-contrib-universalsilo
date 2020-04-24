@@ -54,12 +54,12 @@ module Extensions =
             |> this.[ENV_CLUSTER_AZURE_STORAGE].StringOrDefault
 
         member this.AzureTableStorageConnectionString =
-            String.Empty
+            "UseDevelopmentStorage=true"
             |> this.[ENV_DEFAULT_PERSISTENCE_AZURE_TABLE].StringOrDefault
             |> this.[ENV_PERSISTENCE_AZURE_TABLE].StringOrDefault
 
         member this.AzureBlobStorageConnectionString =
-            String.Empty
+            "UseDevelopmentStorage=true"
             |> this.[ENV_DEFAULT_PERSISTENCE_AZURE_BLOB].StringOrDefault
             |> this.[ENV_PERSISTENCE_AZURE_BLOB].StringOrDefault
 
@@ -132,32 +132,46 @@ module Extensions =
 module Clustering =
     type ClusteringConfigurationObject() = class
         member val ClusteringMode = ClusteringModes.HostLocal with get, set
+        member val ConnectionString : string = "InMemory" with get, set
     end
 
     type ClusteringConfiguration (Logger : ILogger, Configuration : IConfiguration) = class
         let localConfiguration = new ClusteringConfigurationObject ()
         do
-            try
-                let localConfigurationFile = Configuration.GetSection (nameof(ClusteringConfiguration))
-                if localConfigurationFile.Exists () then
-                    localConfigurationFile.Bind(localConfiguration)
-                    Logger.LogInformation("Deducing that we are running locally because a clustering configuration was found.")
-                else
-                    localConfiguration.ClusteringMode <- Configuration.ClusteringMode;
-                    Logger.LogInformation("Not running locally. Clustering mode from environment is: {ClusteringMode}", localConfiguration.ClusteringMode)
+            localConfiguration.ClusteringMode <- Configuration.ClusteringMode
+            Logger.LogInformation("Clustering mode from environment is: {ClusteringMode}", localConfiguration.ClusteringMode)
 
-                    if (localConfiguration.ClusteringMode = ClusteringModes.HostLocal) then
-                        if (File.Exists("/.dockerenv")) then
-                            Logger.LogInformation("Deduced we are running within a Docker environment. Resetting ClusteringMode from HostLocal to Docker")
+            match localConfiguration.ClusteringMode with
+            | ClusteringModes.Azure  ->
+                localConfiguration.ConnectionString <- Configuration.AzureClusteringConnectionString
+            | _ ->
+                localConfiguration.ConnectionString <- String.Empty
+            Logger.LogInformation("Connection string from environment is: {ConnectionString}", localConfiguration.ConnectionString)
 
-                        if (Directory.Exists("/var/run/secrets/kubernetes.io")) then
-                            localConfiguration.ClusteringMode <- ClusteringModes.Kubernetes
-                            Logger.LogInformation("Deduced we are running within a Kubernetes environment. Resetting ClusteringMode from HostLocal to Kubernetes")
-            finally
-                Logger.LogInformation("Finally configuring with clustering mode [{ClusteringMode}]",        localConfiguration.ClusteringMode)
+            if (localConfiguration.ClusteringMode = ClusteringModes.HostLocal) then
+                Logger.LogInformation("Blanking connection string because we are running with HostLocal clustering")
+                localConfiguration.ConnectionString <- String.Empty
+
+                if (File.Exists("/.dockerenv")) then
+                    Logger.LogInformation("Deduced we are running within a Docker environment. Resetting ClusteringMode to Docker and blanking connection string")
+                    localConfiguration.ClusteringMode <- ClusteringModes.Docker
+
+                if (Directory.Exists("/var/run/secrets/kubernetes.io")) then
+                    Logger.LogInformation("Deduced we are running within a Kubernetes environment. Resetting ClusteringMode to Kubernetes and blanking connection string")
+                    localConfiguration.ClusteringMode <- ClusteringModes.Kubernetes
+
+            let localConfigurationFile = Configuration.GetSection (nameof(ClusteringConfiguration))
+            if localConfigurationFile.Exists () then
+                localConfigurationFile.Bind(localConfiguration)
+                Logger.LogInformation("Found a clustering configuration. Overriding values with specified values.")
+
+            Logger.LogInformation("Finally configuring with clustering mode [{ClusteringMode}] with connection string [{ConnectionString}]", localConfiguration.ClusteringMode, localConfiguration.ConnectionString)
 
         /// Returns the ClusteringMode detected from any specified configuration, defaulting to ClusteringModes.HostLocal
         member val ClusteringMode = localConfiguration.ClusteringMode with get, set
+
+        /// Returns the connection string detected from any specified configuration, defaulting to the literal string 'InMemory' signifying in memory storage
+        member val ConnectionString = localConfiguration.ConnectionString with get, set
 
         /// Returns the IP Address the Silo declares that it is hosted at
         /// If the clustering configuration is set to ClusteringModes.Docker container, a stable, non-loopback IP address is detected and used
@@ -194,29 +208,27 @@ module StorageProvider =
     type StorageProviderConfiguration (Logger : ILogger, Configuration : IConfiguration) = class
         let localConfiguration = new StorageProviderConfigurationObject()
         do
-            try
-                let localConfigurationFile = Configuration.GetSection (nameof(StorageProviderConfiguration))
+            localConfiguration.PersistenceMode <- Configuration.PersistenceMode
+            Logger.LogInformation("Persistence mode from environment is: {PersistenceMode}", localConfiguration.PersistenceMode)
 
-                if localConfigurationFile.Exists () then
-                    localConfigurationFile.Bind(localConfiguration)
-                    Logger.LogInformation("Deducing that we are running locally because a persistence configuration was found.")
+            match localConfiguration.PersistenceMode with
+            | PersistenceModes.AzureTable ->
+                localConfiguration.ConnectionString <- Configuration.AzureTableStorageConnectionString
+            | PersistenceModes.AzureBlob ->
+                localConfiguration.ConnectionString <- Configuration.AzureBlobStorageConnectionString
+            | _ | PersistenceModes.InMemory ->
+                localConfiguration.ConnectionString <- String.Empty
+            Logger.LogInformation("Connection string from environment is: {ConnectionString}", localConfiguration.ConnectionString)
 
-                else
-                    localConfiguration.PersistenceMode <- Configuration.PersistenceMode
-                    Logger.LogInformation("Not running locally. Persistence mode from environment is: {PersistenceMode}", localConfiguration.PersistenceMode)
+            let localConfigurationFile = Configuration.GetSection (nameof(StorageProviderConfiguration))
+            if localConfigurationFile.Exists () then
+                localConfigurationFile.Bind(localConfiguration)
+                Logger.LogInformation("Found a persistence configuration. Overriding with specified values")
 
-                    match localConfiguration.PersistenceMode with
-                    | PersistenceModes.AzureTable ->
-                        localConfiguration.ConnectionString <- Configuration.AzureTableStorageConnectionString
-                    | PersistenceModes.AzureBlob ->
-                        localConfiguration.ConnectionString <- Configuration.AzureBlobStorageConnectionString
-                    | _ | PersistenceModes.InMemory ->
-                        localConfiguration.ConnectionString <- "InMemory"
-            finally
-                Logger.LogInformation
-                    ("Finally configuring with persistence mode [{PersistenceMode}] with connection string [{ConnectionString}]",
-                    localConfiguration.PersistenceMode,
-                    localConfiguration.ConnectionString)
+            Logger.LogInformation
+                ("Finally configuring with persistence mode [{PersistenceMode}] with connection string [{ConnectionString}]",
+                localConfiguration.PersistenceMode,
+                localConfiguration.ConnectionString)
 
         /// Returns the PersistenceMode detected from any specified configuration, defaulting to PersistenceModes.InMemory
         member val PersistenceMode = localConfiguration.PersistenceMode with get, set

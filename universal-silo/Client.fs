@@ -64,7 +64,7 @@ type ClusterClientFactory (serviceProvider : IServiceProvider) = class
                     raise <| new NotSupportedException("K8s clustering not supported - use Azure or Docker clustering")
 
                 | ClusteringModes.Azure ->
-                    let connectionString = configuration.AzureClusteringConnectionString
+                    let connectionString = clusteringConfiguration.ConnectionString
                     cb.UseAzureStorageClustering (fun (options : AzureStorageGatewayOptions) ->
                         options.ConnectionString <- connectionString) |> ignore
                     logger.LogInformation ("{ClusteringMode} {ConnectionString}", clusteringConfiguration.ClusteringMode, connectionString)
