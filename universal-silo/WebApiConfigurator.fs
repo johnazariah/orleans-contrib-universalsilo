@@ -71,7 +71,6 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
 
         builder
         |> (fun b -> b.Configure (fun ctx app -> this.Configure app (ctx.HostingEnvironment)))
-        |> (fun b -> b.UseKestrel(fun options -> options.Limits.MaxRequestBodySize <- System.Nullable ()))
         |> (fun b -> b.UseSetting (WebHostDefaults.ApplicationKey, applicationName))
 
     abstract ConfigureWebApiHost : IHostBuilder -> IHostBuilder

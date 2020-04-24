@@ -38,7 +38,7 @@ type SiloConfigurator (forceAzureClustering : bool) = class
                 raise <| NotSupportedException("K8s clustering not supported - use Azure or Docker clustering")
 
             | ClusteringModes.Azure ->
-                let connectionString = configuration.AzureClusteringConnectionString
+                let connectionString = clusteringConfiguration.ConnectionString
                 logger.LogInformation("Configuring Azure Storage Clustering {ConnectionString}", connectionString)
                 sb.UseAzureStorageClustering(fun (options : AzureStorageClusteringOptions) ->
                     options.ConnectionString <- connectionString)
@@ -98,7 +98,7 @@ type SiloConfigurator (forceAzureClustering : bool) = class
                 siloBuilder.UseInMemoryReminderService()
         finally
             logger.LogInformation(
-                "Configuring Persistence for {PersistenceMode} [{ConnectionString}]",
+                "Configuring Reminders with persistence {PersistenceMode} [{ConnectionString}]",
                 storageProviderConfiguration.PersistenceMode,
                 storageProviderConfiguration.ConnectionString)
 
