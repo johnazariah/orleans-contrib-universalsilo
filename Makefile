@@ -147,7 +147,11 @@ copy-ignores.% :
 
 copy:
 	mkdir -p $(target)
-	tar -c --exclude bin --exclude obj --exclude .vs --exclude Properties --exclude *.user $(source) | tar -x --strip-components=2 -C $(target)
+	# Support BSDTAR which is now native on Windows 10, and which is preferred on Windows even though it is unable to do piping! :-/
+	# http://gnuwin32.sourceforge.net/packages/gtar.htm
+	tar -c --exclude bin --exclude obj --exclude .vs --exclude Properties --exclude *.user -f $(target).tar $(source)
+	tar -x --strip-components=2 -C $(target) -f $(target).tar
+	- rm -f $(target).tar
 
 replace-pattern :
 ifneq ("$(wildcard $(output_root)/$(template)-$(suffix)/$(replace_in_file))", "")

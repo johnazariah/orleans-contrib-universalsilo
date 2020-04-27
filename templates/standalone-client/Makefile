@@ -29,11 +29,11 @@ init :
 	git commit -m "Initial commit of Template"
 
 # .NET commands
-dotnet-publish : dotnet-test
+dotnet-publish :
 	dotnet publish --no-build $(project)/$(project)._PROJ_SUFFIX_ -c $(config) -o out/$(project)
 	@echo Built DotNet projects
 
-dotnet-test : dotnet-build
+dotnet-test :
 	dotnet test --no-build $(project).sln -c $(config)
 	@echo Built DotNet projects
 
@@ -41,7 +41,7 @@ dotnet-build : dotnet-restore
 	dotnet build --no-restore $(project).sln -c $(config)
 	@echo Built DotNet projects
 
-dotnet-restore : dotnet-clean
+dotnet-restore :
 	dotnet restore $(project).sln
 	@echo Built DotNet projects
 
@@ -50,7 +50,7 @@ dotnet-clean:
 	dotnet clean $(project).sln
 
 dotnet-run :
-	powershell Start-Process cmd -ArgumentList '/k','$(project).exe' -WorkingDirectory 'out/$(project)'
+	powershell Start-Process 'out/$(project)/$(project).exe' -WorkingDirectory 'out/$(project)'
 	@echo Launched DotNet projects
 
 # Docker commands
@@ -63,12 +63,12 @@ docker-push :
 	@echo Pushed images to container registry
 
 docker-run :
-	powershell Start-Process cmd -ArgumentList '/k',\
+	powershell Start-Process powershell -ArgumentList \
 	'docker','run','--rm',\
 	'$(container_name)'
 
 docker-run-hostlocal :
-	powershell Start-Process cmd -ArgumentList '/k',\
+	powershell Start-Process powershell -ArgumentList \
 	'docker','run','--rm',\
 	'-e','ENV_CLUSTER_MODE=HostLocal',\
 	'-e','silo-address=$(silo_address)',\

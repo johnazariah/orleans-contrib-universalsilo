@@ -31,19 +31,12 @@ init :
 	git commit -m "Initial commit of Template"
 
 # .NET commands
-dotnet-build dotnet-clean dotnet-test
-	$(MAKE) -f $(silo).Makefile   $@
-
-dotnet-run :
+dotnet-clean dotnet-restore dotnet-build dotnet-test dotnet-publish dotnet-run:
 	$(MAKE) -f $(silo).Makefile   $@
 	$(MAKE) -f $(client).Makefile $@
 
 # Docker commands
-docker-build :
-	$(MAKE) -f   $(silo).Makefile project=$(silo)   config=$(config) container_name=$(container_name) $@
-	$(MAKE) -f $(client).Makefile project=$(client) config=$(config) container_name=$(container_name) $@
-
-docker-push docker-run docker-image-explore docker-show:
+docker-build docker-push docker-run docker-image-explore docker-show:
 	$(MAKE) -f $(silo).Makefile   $@
 	$(MAKE) -f $(client).Makefile $@
 
