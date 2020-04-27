@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ master ]
+  # push:
+  #   branches: [ master ]
+
+jobs:
+  build-and-test-solution:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+    - name: build .NET
+      run: make dotnet-build
+    - name: test .NET
+      run: make dotnet-test
+    # - name: build Docker
+    #   run: make docker-build

@@ -2,11 +2,10 @@
 #
 # We'll use some Unix commands here: install git bash with all Unix commands on the PATH
 # We'll need `make`: run `choco install make`
-lc = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(subst G,g,$(subst H,h,$(subst I,i,$(subst J,j,$(subst K,k,$(subst L,l,$(subst M,m,$(subst N,n,$(subst O,o,$(subst P,p,$(subst Q,q,$(subst R,r,$(subst S,s,$(subst T,t,$(subst U,u,$(subst V,v,$(subst W,w,$(subst X,x,$(subst Y,y,$(subst Z,z,$1))))))))))))))))))))))))))
 
 # project name
 project:=Template.Client
-project-lc:=$(call lc,$(project))
+project-lc:=$(shell powershell \"$(project)\".ToLower\(\))
 
 # project configuration
 config:=Debug
@@ -29,11 +28,11 @@ init :
 	git commit -m "Initial commit of Template"
 
 # .NET commands
-dotnet-publish : dotnet-test
+dotnet-publish :
 	dotnet publish --no-build $(project)/$(project)._PROJ_SUFFIX_ -c $(config) -o out/$(project)
 	@echo Built DotNet projects
 
-dotnet-test : dotnet-build
+dotnet-test :
 	dotnet test --no-build $(project).sln -c $(config)
 	@echo Built DotNet projects
 
@@ -41,21 +40,21 @@ dotnet-build : dotnet-restore
 	dotnet build --no-restore $(project).sln -c $(config)
 	@echo Built DotNet projects
 
-dotnet-restore : dotnet-clean
+dotnet-restore :
 	dotnet restore $(project).sln
 	@echo Built DotNet projects
 
-dotnet-clean:
+dotnet-clean :
 	- rm -rf out/$(project)
 	dotnet clean $(project).sln
 
 dotnet-run :
-	powershell Start-Process cmd -ArgumentList '/k','$(project).exe' -WorkingDirectory 'out/$(project)'
+	powershell Start-Process 'out/$(project)/$(project).exe' -WorkingDirectory 'out/$(project)'
 	@echo Launched DotNet projects
 
 # Docker commands
 docker-build :
-	docker build . --rm --build-arg config=$(config) --file Dockerfile --tag $(container_name)
+	docker build . --rm --build-arg config=$(config) --file $(project).Dockerfile --tag $(container_name)
 	@echo Built and tagged images
 
 docker-push :
@@ -63,12 +62,10 @@ docker-push :
 	@echo Pushed images to container registry
 
 docker-run :
-	powershell Start-Process cmd -ArgumentList '/k',\
-	'docker','run','--rm',\
-	'$(container_name)'
+	powershell Start-Process 'docker' -ArgumentList 'run --rm $(container_name)'
 
 docker-run-hostlocal :
-	powershell Start-Process cmd -ArgumentList '/k',\
+	powershell Start-Process powershell -ArgumentList \
 	'docker','run','--rm',\
 	'-e','ENV_CLUSTER_MODE=HostLocal',\
 	'-e','silo-address=$(silo_address)',\
