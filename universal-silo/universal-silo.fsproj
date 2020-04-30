@@ -5,7 +5,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>preview</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>0.5.3</Version>
+    <Version>0.0.0</Version>
+    <Description>This library provides primitives to set up a configurable, application-agnostic Orleans silo and clients. Use it with the Orleans.Contrib.UniversalSilo.Templates to get started with Orleans.</Description>
+    <Authors>John Azariah</Authors>
   </PropertyGroup>
 
   <ItemGroup>
