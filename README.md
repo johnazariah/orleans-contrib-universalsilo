@@ -11,7 +11,7 @@ This library attempts to provide a simple, boilerplate free foundation on which 
 
 Here's how you can quickly get started with Orleans:
 
-1. Install the templates
+**1. Install the templates**
 
 ```shell
 dotnet new --install Orleans.Contrib.UniversalSilo.Templates
@@ -45,7 +45,7 @@ Examples:
 
 ```
 
-2. Create an application with a name like `HelloOrleansWorld`.
+**2. Create an application with a name like `HelloOrleansWorld`.**
 
 ```shell
 $ dotnet new orleans-webapi --name HelloOrleansWorld                                                                                                                                                                                         The template "Orleans: WebAPI Direct Client" was created successfully.
@@ -53,7 +53,7 @@ $ dotnet new orleans-webapi --name HelloOrleansWorld                            
 
 This will create a fully-functional sample application in the `HelloOrleansWorld` folder.
 
-3. Inspect the sample app
+**3. Inspect the sample app**
 
 ```shell
 $ cd HelloOrleansWorld/
@@ -75,7 +75,10 @@ drwxr-xr-x 1 johnaz 4096    0 Apr 30 08:41 HelloOrleansWorld/
 
 ```
 
-4. Build, Test and Run the sample app.
+You will notice that it contains:
+* A projects, a solution file, scripts to help you build and package your application, support for Docker containers, and a simple CI pipeline for github.
+
+**4. Build, Test and Run the sample app.**
 
 ```shell
 $ dotnet build HelloOrleansWorld.sln
@@ -120,13 +123,19 @@ Don't forget to _allow_ the firewall configuration in the next step.
 ```shell
 $ dotnet run --project HelloOrleansWorld/HelloOrleansWorld.csproj
 info: SiloConfigurator[0]
-      Not running locally. Clustering mode from environment is: HostLocal
+      Clustering mode from environment is: HostLocal
 info: SiloConfigurator[0]
-      Finally configuring with clustering mode [HostLocal]
+      Connection string from environment is:
 info: SiloConfigurator[0]
-      Not running locally. Persistence mode from environment is: InMemory
+      Blanking connection string because we are running with HostLocal clustering
 info: SiloConfigurator[0]
-      Finally configuring with persistence mode [InMemory] with connection string [InMemory]
+      Finally configuring with clustering mode [HostLocal] with connection string []
+info: SiloConfigurator[0]
+      Persistence mode from environment is: InMemory
+info: SiloConfigurator[0]
+      Connection string from environment is:
+info: SiloConfigurator[0]
+      Finally configuring with persistence mode [InMemory] with connection string []
 info: SiloConfigurator[0]
       Using the loopback address for [HostLocal]
 info: SiloConfigurator[0]
@@ -134,13 +143,9 @@ info: SiloConfigurator[0]
 info: SiloConfigurator[0]
       Configuring Endpoints and Silo Address for clustering mode HostLocal [127.0.0.1:(11111, 30000)]
 info: SiloConfigurator[0]
-      Configuring Persistence for InMemory [InMemory]
+      Configuring Persistence for InMemory []
 info: SiloConfigurator[0]
       No dashboard available for clustering mode HostLocal
-info: SiloConfigurator[0]
-      `FastKillOnProcessExit = False` for clustering mode HostLocal
-info: Orleans.Runtime.Silo[100404]
-      Silo starting with GC settings: ServerGC=True GCLatencyMode=Interactive
 ...
 ...
 -------------- Started silo S127.0.0.1:11111:325957930, ConsistentHashCode 26F31827 --------------
@@ -160,16 +165,20 @@ info: Microsoft.Hosting.Lifetime[0]
       Hosting environment: Production
 info: Microsoft.Hosting.Lifetime[0]
       Content root path: ...\HelloOrleansWorld\HelloOrleansWorld
+...
+...
 ```
 
 Now fire up a browser and point it to https://localhost:5001/swagger/index.html and you will be presented with the API for a simple calculator which knows how to add two numbers.
 
-This is a fully functional Orleans-based application exposing its functionality via a WebApi front end.
+Try it out. You are exercising a grain-based calculator!
 
-5. Make it your own
+You now have is a fully functional Orleans-based application exposing its functionality via a WebApi front end.
+
+**5. Make it your own**
 
 Take your time and look over the various projects in the solution. Add your own grains, tests and controllers. Rebuilding and running the application will extend it and make it your own!
 
-6. Learn more
+**6. Learn more**
 
-The application generated here is a sophisticated starting point. It has built-in support for configuration, extension, tests, CI/CD and deployment. Follow the [documentation](https://johnazariah.github.io/orleans-contrib-universalsilo/) to learn more.
+The application generated here is a sophisticated starting point. It has built-in support for configuration, extension, tests, CI/CD, packaging and deployment. Follow the [documentation](https://johnazariah.github.io/orleans-contrib-universalsilo/) to learn more.
