@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "oaks", "oaks\oaks.fsproj", "{91AD5A7C-6D9E-4B45-8141-F3C4BE246DC4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91AD5A7C-6D9E-4B45-8141-F3C4BE246DC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91AD5A7C-6D9E-4B45-8141-F3C4BE246DC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91AD5A7C-6D9E-4B45-8141-F3C4BE246DC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91AD5A7C-6D9E-4B45-8141-F3C4BE246DC4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {736E1BB2-FAC9-4F57-8D20-CF47AE948F85}
+	EndGlobalSection
+EndGlobal
