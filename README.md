@@ -48,14 +48,24 @@ Examples:
 **2. Create an application with a name like `HelloOrleansWorld`.**
 
 ```shell
-$ dotnet new orleans-webapi --name HelloOrleansWorld                                                                          The template "Orleans: WebAPI Direct Client" was created successfully.
+$ dotnet new orleans-webapi --name HelloOrleansWorld
+The template "Orleans: WebAPI Direct Client" was created successfully.
 ```
 
 This will create a fully-functional sample application in the `HelloOrleansWorld` folder.
 
+You can also choose to generate the project in **F#** by using the following command:
+
+```shell
+$ dotnet new orleans-webapi --name HelloOrleansWorld --language F#
+The template "Orleans: WebAPI Direct Client" was created successfully.
+```
+
+
 **3. Inspect the sample app**
 
 ```shell
+$ cd HelloOrleansWorld
 $ ls -al
 total 31
 drwxr-xr-x 1 REDMOND+johnaz 4096    0 Apr 30 09:50 ./
@@ -75,11 +85,11 @@ drwxr-xr-x 1 REDMOND+johnaz 4096    0 Apr 30 09:50 HelloOrleansWorld/
 ```
 
 You will notice that it contains:
-* A console application project named `HelloOrleansWorld` which is the host application.
-* A library project for grains where the grain interfaces and implementations are held
-* A library project for grain-controllers where controllers are provided to expose grain methods over WebAPI
-* A test project where grains can be tested in a test cluster.
-* A solution file to group all the linked projects together
+* A _console application_ project named `HelloOrleansWorld` which is the **host application**
+* A _class library_ project for **grains** where the grain interfaces and implementations are held
+* A _class library_ project for **grain-controllers** where controllers are provided to expose grain methods over WebAPI
+* A _xunit test_ project where grains can be tested in a test cluster, with examples of how to do **unit-** and **property-based-** testing
+* A _solution file_ to coordinate the projects together
 * A `Makefile` script to help you with the incantations to use whilst developing
 * A `Dockerfile` script to package your application into a Docker container
 * `.gitignore` and `.dockerignore` files to help keep your working set clean
@@ -194,4 +204,8 @@ Take your time and look over the various projects in the solution. Add your own 
 
 **6. Learn more**
 
-The application generated here is a sophisticated starting point. It has built-in support for configuration, extension, tests, CI/CD, packaging and deployment. Follow the [documentation](https://johnazariah.github.io/orleans-contrib-universalsilo/) to learn more.
+The application generated here is a sophisticated starting point.
+
+It has built-in support for configuration, extension, tests, CI/CD, packaging and deployment.
+
+Follow the [documentation](https://johnazariah.github.io/orleans-contrib-universalsilo/) to learn more.
