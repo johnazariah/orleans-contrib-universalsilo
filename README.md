@@ -48,7 +48,7 @@ Examples:
 **2. Create an application with a name like `HelloOrleansWorld`.**
 
 ```shell
-$ dotnet new orleans-webapi --name HelloOrleansWorld                                                                                                                                                                                         The template "Orleans: WebAPI Direct Client" was created successfully.
+$ dotnet new orleans-webapi --name HelloOrleansWorld                                                                          The template "Orleans: WebAPI Direct Client" was created successfully.
 ```
 
 This will create a fully-functional sample application in the `HelloOrleansWorld` folder.
@@ -56,27 +56,40 @@ This will create a fully-functional sample application in the `HelloOrleansWorld
 **3. Inspect the sample app**
 
 ```shell
-$ cd HelloOrleansWorld/
 $ ls -al
-total 23
-drwxr-xr-x 1 johnaz 4096    0 Apr 30 08:41 ./
-drwxr-xr-x 1 johnaz 4096    0 Apr 30 08:41 ../
--rw-r--r-- 1 johnaz 4096  124 Apr 30 08:41 .dockerignore
--rw-r--r-- 1 johnaz 4096 3266 Apr 30 08:41 .gitignore
--rw-r--r-- 1 johnaz 4096  206 Apr 30 08:41 docker-compose.yml
--rw-r--r-- 1 johnaz 4096 1842 Apr 30 08:41 Dockerfile
-drwxr-xr-x 1 johnaz 4096    0 Apr 30 08:41 grain-controllers/
-drwxr-xr-x 1 johnaz 4096    0 Apr 30 08:41 grains/
-drwxr-xr-x 1 johnaz 4096    0 Apr 30 08:41 grain-tests/
-drwxr-xr-x 1 johnaz 4096    0 Apr 30 08:41 HelloOrleansWorld/
--rw-r--r-- 1 johnaz 4096 2578 Apr 30 08:41 HelloOrleansWorld.sln
--rw-r--r-- 1 johnaz 4096 3083 Apr 30 08:41 Makefile
--rw-r--r-- 1 johnaz 4096  223 Apr 30 08:41 tye.yaml
-
+total 31
+drwxr-xr-x 1 REDMOND+johnaz 4096    0 Apr 30 09:50 ./
+drwxr-xr-x 1 REDMOND+johnaz 4096    0 Apr 30 09:50 ../
+-rw-r--r-- 1 REDMOND+johnaz 4096  124 Apr 30 09:50 .dockerignore
+drwxr-xr-x 1 REDMOND+johnaz 4096    0 Apr 30 09:50 .github/
+-rw-r--r-- 1 REDMOND+johnaz 4096 3266 Apr 30 09:50 .gitignore
+-rw-r--r-- 1 REDMOND+johnaz 4096  206 Apr 30 09:50 docker-compose.yml
+-rw-r--r-- 1 REDMOND+johnaz 4096 2119 Apr 30 09:50 Dockerfile
+drwxr-xr-x 1 REDMOND+johnaz 4096    0 Apr 30 09:51 grain-controllers/
+drwxr-xr-x 1 REDMOND+johnaz 4096    0 Apr 30 09:51 grains/
+drwxr-xr-x 1 REDMOND+johnaz 4096    0 Apr 30 09:50 grain-tests/
+drwxr-xr-x 1 REDMOND+johnaz 4096    0 Apr 30 09:50 HelloOrleansWorld/
+-rw-r--r-- 1 REDMOND+johnaz 4096 2578 Apr 30 09:50 HelloOrleansWorld.sln
+-rw-r--r-- 1 REDMOND+johnaz 4096 2720 Apr 30 09:50 Makefile
+-rw-r--r-- 1 REDMOND+johnaz 4096  223 Apr 30 09:50 tye.yaml
 ```
 
 You will notice that it contains:
-* A projects, a solution file, scripts to help you build and package your application, support for Docker containers, and a simple CI pipeline for github.
+* A console application project named `HelloOrleansWorld` which is the host application.
+* A library project for grains where the grain interfaces and implementations are held
+* A library project for grain-controllers where controllers are provided to expose grain methods over WebAPI
+* A test project where grains can be tested in a test cluster.
+* A solution file to group all the linked projects together
+* A `Makefile` script to help you with the incantations to use whilst developing
+* A `Dockerfile` script to package your application into a Docker container
+* `.gitignore` and `.dockerignore` files to help keep your working set clean
+* A `.github` folder which contains a simple CI pipeline ready to build your library if you commit it to a GitHub repository
+
+[Experimental]
+* A `tye.yaml` script to build, run and deploy your application via [Tye](https://github.com/dotnet/tye)
+* A `docker-compose.yml` script to orchestrate a multi-node cluster on your local machine
+
+In future, there will be scripts to help you set up Azure CI pipelines & AKS clusters, deploy to Kubernetes clusters, and so forth.
 
 **4. Build, Test and Run the sample app.**
 
