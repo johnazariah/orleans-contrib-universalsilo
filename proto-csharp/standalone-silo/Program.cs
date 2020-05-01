@@ -8,7 +8,7 @@ namespace Template.StandaloneSilo
     /// </summary>
     class SiloConfigurator : Orleans.Contrib.UniversalSilo.SiloConfigurator
     {
-        public SiloConfigurator() : base(false)
+        public SiloConfigurator() : base()
         { }
     }
 
@@ -28,10 +28,10 @@ namespace Template.StandaloneSilo
     /// </summary>
     class Program
     {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+        public static void Main(string[] args) =>
+            CreateHostBuilder(args)
+            .Build()
+            .Run();
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host
