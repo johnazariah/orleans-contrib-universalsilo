@@ -43,7 +43,7 @@ module Enumerations =
     | AzureTable           = 1
     | AzureBlob            = 2
 
-module StringOps =
+module private StringOps =
     let [<Literal>] TruncatedLength = 16
     let truncateSecretString (s : String) =
         if (String.IsNullOrWhiteSpace s) then
@@ -136,7 +136,6 @@ module Configuration =
     type IConfiguration with
         // clustering settings
         member private this.SiloAddress = this.["silo-address"]
-
         member private this.ClusteringMode  def =
             def
             |> this.[ENV_CLUSTER_MODE].EnumOrDefault
@@ -234,7 +233,7 @@ module Configuration =
 
                     | ClusteringModes.HostLocal
                     | _ ->
-                        logger.LogInformation("Using the loopback address for [{ClusteringMode}]", localConfiguration.ClusteringMode);
+                        logger.LogInformation("Using the loopback address for [{ClusteringMode}]", localConfiguration.ClusteringMode)
                         IPAddress.Loopback
             localConfiguration.SiloAddress <- siloAddress
             localConfiguration

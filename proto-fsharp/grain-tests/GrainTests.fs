@@ -35,7 +35,7 @@ type public GrainTests(fixture : ClusterFixture) = class
         // this is an example of creating a grain within the test from using the TestCluster instance
         let adderGrain = fixture.Cluster.GrainFactory.GetGrain<ICalculatorGrain> <| Guid.NewGuid()
         let result = adderGrain.Add 1 2 |> Async.AwaitTask |> Async.RunSynchronously
-        Assert.Equal(3, result);
+        Assert.Equal(3, result)
 
     /// <summary>
     /// This is a property-based test.
