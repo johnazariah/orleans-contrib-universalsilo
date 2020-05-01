@@ -169,7 +169,7 @@ test-projects.% :
 	- $(MAKE) suffix=$* test-project.webapi test-project.silo test-project.client test-project.silo-and-client
 
 test-project.% : create-scratch-project.%
-	$(MAKE) -C $(scratch_root)/$(suffix)/$*/ dotnet-test
+	$(MAKE) -C $(scratch_root)/$(suffix)/$*/ dotnet-build dotnet-test
 	@echo Tested Project $* [$(suffix)]
 
 create-scratch-project.% :
