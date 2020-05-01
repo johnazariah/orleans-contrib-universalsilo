@@ -38,7 +38,7 @@ type SiloConfigurator() = class
         siloBuilder
 
     abstract ConfigureClustering : IConfiguration -> UniversalSiloConfiguration -> ISiloBuilder -> ISiloBuilder
-    default this.ConfigureClustering configuration siloSettings siloBuilder =
+    default __.ConfigureClustering configuration siloSettings siloBuilder =
         let configureClusterOptions (options : ClusterOptions) =
             options.ClusterId <- siloSettings.SiloConfiguration.ClusterId
             options.ServiceId <- siloSettings.SiloConfiguration.ServiceId
