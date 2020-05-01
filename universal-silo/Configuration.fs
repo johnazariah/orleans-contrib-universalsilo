@@ -115,18 +115,24 @@ type UniversalSiloConfiguration = {
 [<AutoOpen>]
 [<Extension>]
 module Extensions =
-    /// applies `_action` on `this` as an extension method. returns `_this` for further chaining.
-    let [<Extension>] inline ApplyConfiguration (_this : 'a) (_action : Func<'a, 'a>) =
-        _action.Invoke _this
+    type IHostBuilder with
+        member this.ApplyAppConfiguration() =
+            this.ConfigureHostConfiguration (fun cb ->
+                cb
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("clustering.json",  optional = true, reloadOnChange = false)
+                    .AddJsonFile("persistence.json", optional = true, reloadOnChange = false)
+                |> ignore)
 
-    let [<Extension>] inline ApplyAppConfiguration(_this : IHostBuilder) =
-        let configureAppConfiguration (cb : IConfigurationBuilder) =
-            cb
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("clustering.json",  optional = true, reloadOnChange = false)
-                .AddJsonFile("persistence.json", optional = true, reloadOnChange = false)
-            |> ignore
-        _this.ConfigureAppConfiguration configureAppConfiguration
+        member this.ApplyConfiguration f =
+            f this
+
+    let [<Extension>] inline ApplyConfiguration (_this : IHostBuilder) (_func : Func<IHostBuilder, IHostBuilder>) =
+        _this.ApplyConfiguration (fun hb -> _func.Invoke hb)
+
+    let [<Extension>] inline ApplyAppConfiguration (_this : IHostBuilder) =
+        _this.ApplyAppConfiguration()
+
 
 [<AutoOpen>]
 module Configuration =

@@ -1,25 +1,16 @@
 ﻿namespace Template.StandaloneSilo
 
 open Microsoft.Extensions.Hosting
-open Orleans.Contrib.UniversalSilo.Configuration
+open Orleans.Contrib.UniversalSilo.Configuration.Extensions
 
 /// <summary>
 /// Override methods in this class to take over how the silo is configured
 /// </summary>
 type SiloConfigurator () = class
-    inherit Orleans.Contrib.UniversalSilo.SiloConfigurator(false)
+    inherit Orleans.Contrib.UniversalSilo.SiloConfigurator()
 end
 
 module Program =
-    let CreateHostBuilderString args =
-        let siloConfigurator =
-            new SiloConfigurator()
-            |> (fun sc -> sc.ConfigureSiloHost)
-
-        (Host.CreateDefaultBuilder args)
-        |> ApplyAppConfiguration
-        |> (fun hb -> hb.UseOrleans siloConfigurator)
-
     /// <summary>
     ///
     /// This is the entry point to the silo.
@@ -36,8 +27,9 @@ module Program =
     /// </summary>
     [<EntryPoint>]
     let Main args =
-       CreateHostBuilderString args
-       |> (fun hb -> hb.Build())
-       |> (fun hb -> hb.Run())
-
-       0
+        (Host.CreateDefaultBuilder args)
+            .ApplyAppConfiguration()
+            .UseOrleans((new SiloConfigurator()).ConfigureSiloHost)
+            .Build()
+            .Run()
+        0
