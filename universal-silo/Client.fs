@@ -32,7 +32,14 @@ end
 type ClusterClientFactory (serviceProvider : IServiceProvider) = class
     let logger = serviceProvider.GetService<ILogger<ClusterClientFactory>> ()
     let configuration = serviceProvider.GetService<IConfiguration> ()
-    let clusteringConfiguration = new ClusteringConfiguration (logger, configuration)
+
+    let clusteringConfiguration =
+        new ClusteringConfiguration()
+        |> BuildClusteringConfiguration logger configuration
+
+    let siloConfiguration =
+        new SiloConfiguration ()
+        |> BuildSiloConfiguration logger configuration
 
     let clusterClient =
         lazy
@@ -49,15 +56,7 @@ type ClusterClientFactory (serviceProvider : IServiceProvider) = class
                 in
                 System.Func<exn, Task<bool>> retryOnFailure'
 
-            new ClientBuilder ()
-            |> (fun cb -> cb.ConfigureApplicationParts (fun parts ->
-                parts.AddFromApplicationBaseDirectory () |> ignore))
-
-            |> (fun cb -> cb.Configure<ClusterOptions> (fun (options : ClusterOptions) ->
-                options.ClusterId <- configuration.ClusterId
-                options.ServiceId <- configuration.ServiceId))
-
-            |> (fun cb ->
+            let setClusteringMode (cb : IClientBuilder) =
                 match clusteringConfiguration.ClusteringMode with
                 | ClusteringModes.Kubernetes ->
                     logger.LogInformation ("{ClusteringMode} : NOT SUPPORTED", clusteringConfiguration.ClusteringMode)
@@ -70,19 +69,24 @@ type ClusterClientFactory (serviceProvider : IServiceProvider) = class
                     logger.LogInformation ("{ClusteringMode} {ConnectionString}", clusteringConfiguration.ClusteringMode, connectionString)
 
                 | ClusteringModes.Docker | ClusteringModes.HostLocal | _ ->
-                    let siloAddress = clusteringConfiguration.GetSiloAddress()
-                    let gatewayPort = configuration.GatewayPort
+                    let siloAddress = clusteringConfiguration.SiloAddress
+                    let gatewayPort = siloConfiguration.GatewayPort
                     let endpointUri = IPEndPoint (siloAddress, gatewayPort) |> ToGatewayUri
                     cb.UseStaticClustering (fun (option : StaticGatewayListProviderOptions) ->
                         option.Gateways.Add <| endpointUri) |> ignore
                     logger.LogInformation ("{ClusteringMode} {EndpointUri}", clusteringConfiguration.ClusteringMode, endpointUri)
-                cb)
+                cb
 
-            |> (fun cb -> cb.Build())
+            let client =
+                (new ClientBuilder() |> setClusteringMode)
+                    .ConfigureApplicationParts(fun parts -> parts.AddFromApplicationBaseDirectory () |> ignore)
+                    .Configure<ClusterOptions>(fun (options : ClusterOptions) ->
+                        options.ClusterId <- siloConfiguration.ClusterId
+                        options.ServiceId <- siloConfiguration.ServiceId)
+                    .Build()
 
-            |> (fun client ->
-                    client.Connect retryOnFailure |> Async.AwaitTask |> Async.RunSynchronously
-                    client)
+            client.Connect retryOnFailure |> Async.AwaitTask |> Async.RunSynchronously
+            client
 
     member __.GetClusterClient() =
         clusterClient.Value

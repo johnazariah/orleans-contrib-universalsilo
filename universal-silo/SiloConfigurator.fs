@@ -11,34 +11,50 @@ open System.Net
 
 type HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext
 
-type SiloConfigurator (forceAzureClustering : bool) = class
+type SiloConfigurator() = class
     let loggerFactory = LoggerFactory.Create(fun builder -> builder.AddConsole () |> ignore)
     let logger = loggerFactory.CreateLogger("SiloConfigurator")
 
     member val public Logger = logger
 
-    abstract ConfigureServices : ISiloBuilder -> ISiloBuilder
-    default __.ConfigureServices siloBuilder =
+    abstract SiloConfiguration : SiloConfiguration
+    default __.SiloConfiguration =
+        new SiloConfiguration()
+
+    abstract StorageProviderConfiguration : StorageProviderConfiguration
+    default __.StorageProviderConfiguration =
+        new StorageProviderConfiguration()
+
+    abstract ClusteringConfiguration : ClusteringConfiguration
+    default __.ClusteringConfiguration =
+        new ClusteringConfiguration()
+
+    abstract TelemetryConfiguration : TelemetryConfiguration
+    default __.TelemetryConfiguration =
+        new TelemetryConfiguration()
+
+    abstract ConfigureServices : IConfiguration -> UniversalSiloConfiguration -> ISiloBuilder -> ISiloBuilder
+    default __.ConfigureServices configuration siloSettings siloBuilder =
         siloBuilder
 
-    abstract ConfigureClustering : IConfiguration -> ClusteringConfiguration -> ISiloBuilder -> ISiloBuilder
-    default __.ConfigureClustering configuration clusteringConfiguration siloBuilder =
-        let siloAddress = clusteringConfiguration.GetSiloAddress ()
-        let siloPort    = configuration.SiloPort
-        let gatewayPort = configuration.GatewayPort
-
+    abstract ConfigureClustering : IConfiguration -> UniversalSiloConfiguration -> ISiloBuilder -> ISiloBuilder
+    default this.ConfigureClustering configuration siloSettings siloBuilder =
         let configureClusterOptions (options : ClusterOptions) =
-            options.ClusterId <- configuration.ClusterId
-            options.ServiceId <- configuration.ServiceId
+            options.ClusterId <- siloSettings.SiloConfiguration.ClusterId
+            options.ServiceId <- siloSettings.SiloConfiguration.ServiceId
+
+        let siloAddress = siloSettings.ClusteringConfiguration.SiloAddress
+        let siloPort    = siloSettings.SiloConfiguration.SiloPort
+        let gatewayPort = siloSettings.SiloConfiguration.GatewayPort
 
         let configureClusterMembership (sb : ISiloBuilder) =
-            match clusteringConfiguration.ClusteringMode with
+            match siloSettings.ClusteringConfiguration.ClusteringMode with
             | ClusteringModes.Kubernetes ->
-                logger.LogInformation ("{ClusteringMode} : NOT SUPPORTED", clusteringConfiguration.ClusteringMode)
+                logger.LogInformation ("{ClusteringMode} : NOT SUPPORTED", siloSettings.ClusteringConfiguration.ClusteringMode)
                 raise <| NotSupportedException("K8s clustering not supported - use Azure or Docker clustering")
 
             | ClusteringModes.Azure ->
-                let connectionString = clusteringConfiguration.ConnectionString
+                let connectionString = siloSettings.ClusteringConfiguration.ConnectionString
                 logger.LogInformation("Configuring Azure Storage Clustering {ConnectionString}", connectionString)
                 sb.UseAzureStorageClustering(fun (options : AzureStorageClusteringOptions) ->
                     options.ConnectionString <- connectionString)
@@ -48,18 +64,18 @@ type SiloConfigurator (forceAzureClustering : bool) = class
                 IPEndPoint(siloAddress, siloPort) |> sb.UseDevelopmentClustering
 
         let configureEndpoints (sb : ISiloBuilder) =
-            match clusteringConfiguration.ClusteringMode with
+            match siloSettings.ClusteringConfiguration.ClusteringMode with
             | ClusteringModes.Kubernetes | ClusteringModes.Azure ->
                 logger.LogInformation(
                     "Configuring Endpoints without silo address for clustering mode {ClusteringMode} [({SiloPort}, {GatewayPort})]",
-                    clusteringConfiguration.ClusteringMode,
+                    siloSettings.ClusteringConfiguration.ClusteringMode,
                     siloPort,
                     gatewayPort)
                 sb.ConfigureEndpoints(siloPort, gatewayPort, listenOnAnyHostAddress = true)
             | _ ->
                 logger.LogInformation(
                     "Configuring Endpoints and Silo Address for clustering mode {ClusteringMode} [{SiloAddress}:({SiloPort}, {GatewayPort})]",
-                    clusteringConfiguration.ClusteringMode,
+                    siloSettings.ClusteringConfiguration.ClusteringMode,
                     siloAddress,
                     siloPort,
                     gatewayPort)
@@ -69,68 +85,68 @@ type SiloConfigurator (forceAzureClustering : bool) = class
         |> configureClusterMembership
         |> configureEndpoints
 
-    abstract ConfigureStorageProvider : IConfiguration -> StorageProviderConfiguration -> ISiloBuilder -> ISiloBuilder
-    default __.ConfigureStorageProvider configuration storageProviderConfiguration siloBuilder =
+    abstract ConfigureStorageProvider : IConfiguration -> UniversalSiloConfiguration -> ISiloBuilder -> ISiloBuilder
+    default __.ConfigureStorageProvider configuration siloSettings siloBuilder =
         try
-            match storageProviderConfiguration.PersistenceMode with
+            match siloSettings.StorageProviderConfiguration.PersistenceMode with
             | PersistenceModes.AzureTable ->
                 siloBuilder.AddAzureTableGrainStorageAsDefault(fun (option : AzureTableStorageOptions) ->
-                    option.ConnectionString <- storageProviderConfiguration.ConnectionString)
+                    option.ConnectionString <- siloSettings.StorageProviderConfiguration.ConnectionString)
             | PersistenceModes.AzureBlob ->
                 siloBuilder.AddAzureBlobGrainStorageAsDefault(fun (option : AzureBlobStorageOptions) ->
-                    option.ConnectionString <- storageProviderConfiguration.ConnectionString)
+                    option.ConnectionString <- siloSettings.StorageProviderConfiguration.ConnectionString)
             | PersistenceModes.InMemory | _ ->
                 siloBuilder.AddMemoryGrainStorageAsDefault()
         finally
             logger.LogInformation(
                 "Configuring Persistence for {PersistenceMode} [{ConnectionString}]",
-                storageProviderConfiguration.PersistenceMode,
-                storageProviderConfiguration.ConnectionString)
+                siloSettings.StorageProviderConfiguration.PersistenceMode,
+                siloSettings.StorageProviderConfiguration.ConnectionString)
 
-    abstract ConfigureReminderService : IConfiguration -> StorageProviderConfiguration -> ISiloBuilder -> ISiloBuilder
-    default __.ConfigureReminderService configuration storageProviderConfiguration siloBuilder =
+    abstract ConfigureReminderService : IConfiguration -> UniversalSiloConfiguration -> ISiloBuilder -> ISiloBuilder
+    default __.ConfigureReminderService configuration siloSettings siloBuilder =
         try
-            match storageProviderConfiguration.PersistenceMode with
+            match siloSettings.StorageProviderConfiguration.PersistenceMode with
             | PersistenceModes.AzureTable | PersistenceModes.AzureBlob ->
                 siloBuilder.UseAzureTableReminderService(fun (option : AzureTableReminderStorageOptions) ->
-                    option.ConnectionString <- storageProviderConfiguration.ConnectionString)
+                    option.ConnectionString <- siloSettings.StorageProviderConfiguration.ConnectionString)
             | PersistenceModes.InMemory | _ ->
                 siloBuilder.UseInMemoryReminderService()
         finally
             logger.LogInformation(
                 "Configuring Reminders with persistence {PersistenceMode} [{ConnectionString}]",
-                storageProviderConfiguration.PersistenceMode,
-                storageProviderConfiguration.ConnectionString)
+                siloSettings.StorageProviderConfiguration.PersistenceMode,
+                siloSettings.StorageProviderConfiguration.ConnectionString)
 
-    abstract ConfigureApplicationInsights : string -> ISiloBuilder -> ISiloBuilder
-    default __.ConfigureApplicationInsights instrumentationKey siloBuilder =
-        siloBuilder.AddApplicationInsightsTelemetryConsumer instrumentationKey
+    abstract ConfigureApplicationInsights : IConfiguration -> UniversalSiloConfiguration -> ISiloBuilder -> ISiloBuilder
+    default __.ConfigureApplicationInsights configuration siloSettings siloBuilder =
+        siloBuilder.AddApplicationInsightsTelemetryConsumer siloSettings.TelemetryConfiguration.ApplicationInsightsKey
 
-    abstract ConfigureDashboard : ClusteringConfiguration -> ISiloBuilder -> ISiloBuilder
-    default __.ConfigureDashboard clusteringConfiguration siloBuilder =
-        match clusteringConfiguration.ClusteringMode with
+    abstract ConfigureDashboard : IConfiguration -> UniversalSiloConfiguration -> ISiloBuilder -> ISiloBuilder
+    default __.ConfigureDashboard configuration siloSettings siloBuilder =
+        match siloSettings.ClusteringConfiguration.ClusteringMode with
         | ClusteringModes.HostLocal ->
             logger.LogInformation(
                 "No dashboard available for clustering mode {ClusteringMode}",
-                clusteringConfiguration.ClusteringMode)
+                siloSettings.ClusteringConfiguration.ClusteringMode)
             siloBuilder
         | _ ->
             logger.LogInformation(
                 "Starting dashboard for clustering mode {ClusteringMode}",
-                clusteringConfiguration.ClusteringMode);
+                siloSettings.ClusteringConfiguration.ClusteringMode);
             siloBuilder.UseDashboard();
 
-    abstract ConfigureProcessExitHandlingOptions : ClusteringConfiguration -> ISiloBuilder -> ISiloBuilder
-    default __.ConfigureProcessExitHandlingOptions clusteringConfiguration siloBuilder =
+    abstract ConfigureProcessExitHandlingOptions : IConfiguration -> UniversalSiloConfiguration -> ISiloBuilder -> ISiloBuilder
+    default __.ConfigureProcessExitHandlingOptions configuration siloSettings siloBuilder =
         let fastKillOnProcessExit =
-            match clusteringConfiguration.ClusteringMode with
+            match siloSettings.ClusteringConfiguration.ClusteringMode with
             | ClusteringModes.Kubernetes | ClusteringModes.Docker -> true
             | _ -> false
 
         logger.LogInformation(
             "`FastKillOnProcessExit = {FastKillOnProcessExit}` for clustering mode {ClusteringMode}",
             fastKillOnProcessExit,
-            clusteringConfiguration.ClusteringMode)
+            siloSettings.ClusteringConfiguration.ClusteringMode)
 
         siloBuilder.Configure(fun (options : ProcessExitHandlingOptions) ->
             options.FastKillOnProcessExit <- fastKillOnProcessExit)
@@ -144,19 +160,36 @@ type SiloConfigurator (forceAzureClustering : bool) = class
 
     abstract ConfigureSiloHost : HostBuilderContext -> ISiloBuilder -> unit
     default this.ConfigureSiloHost hostBuilderContext siloBuilder =
-        let configuration                = hostBuilderContext.Configuration;
-        let clusteringConfiguration      = new ClusteringConfiguration(logger, configuration);
-        let storageProviderConfiguration = new StorageProviderConfiguration(logger, configuration);
+        let clusteringConfiguration =
+            this.ClusteringConfiguration
+            |> BuildClusteringConfiguration logger hostBuilderContext.Configuration
 
-        if forceAzureClustering then clusteringConfiguration.ClusteringMode <- ClusteringModes.Azure;
+        let storageProviderConfiguration =
+            this.StorageProviderConfiguration
+            |> BuildStorageProviderConfiguration logger hostBuilderContext.Configuration
+
+        let siloConfiguration =
+            this.SiloConfiguration
+            |> BuildSiloConfiguration logger hostBuilderContext.Configuration
+
+        let telemetryConfiguration =
+            this.TelemetryConfiguration
+            |> BuildTelemetryConfiguration logger hostBuilderContext.Configuration
+
+        let configuration = {
+            ClusteringConfiguration = clusteringConfiguration
+            StorageProviderConfiguration = storageProviderConfiguration
+            SiloConfiguration = siloConfiguration
+            TelemetryConfiguration = telemetryConfiguration
+        }
 
         siloBuilder
-        |> this.ConfigureServices
-        |> this.ConfigureClustering                 configuration clusteringConfiguration
-        |> this.ConfigureStorageProvider            configuration storageProviderConfiguration
-        |> this.ConfigureApplicationInsights        configuration.AppInsightsKey
-        |> this.ConfigureDashboard                  clusteringConfiguration
-        |> this.ConfigureProcessExitHandlingOptions clusteringConfiguration
+        |> this.ConfigureServices                   hostBuilderContext.Configuration configuration
+        |> this.ConfigureClustering                 hostBuilderContext.Configuration configuration
+        |> this.ConfigureStorageProvider            hostBuilderContext.Configuration configuration
+        |> this.ConfigureApplicationInsights        hostBuilderContext.Configuration configuration
+        |> this.ConfigureDashboard                  hostBuilderContext.Configuration configuration
+        |> this.ConfigureProcessExitHandlingOptions hostBuilderContext.Configuration configuration
         |> this.ConfigureApplicationParts
         |> ignore
 end

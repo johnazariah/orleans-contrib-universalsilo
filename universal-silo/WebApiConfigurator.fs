@@ -18,7 +18,7 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
     let mutable configuration : IConfiguration = null
     member val public Configuration = configuration
 
-    member this.SetConfigurationObject (hostBuilderContext : HostBuilderContext) =
+    member __.SetConfigurationObject (hostBuilderContext : HostBuilderContext) =
         configuration <- hostBuilderContext.Configuration
 
     abstract AddSwaggerGen : IServiceCollection -> IServiceCollection
@@ -32,7 +32,8 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
 
     abstract AddResponseCompression : IServiceCollection -> IServiceCollection
     default __.AddResponseCompression services =
-        services.AddResponseCompression()
+        services
+            .AddResponseCompression()
             .Configure(fun (options : BrotliCompressionProviderOptions) ->
                 options.Level <- CompressionLevel.Optimal)
             .Configure(fun (options : GzipCompressionProviderOptions) ->
@@ -41,8 +42,8 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
     abstract ConfigureServices : HostBuilderContext -> IServiceCollection -> IServiceCollection
     default this.ConfigureServices hostBuilderContext services =
         services
-        |> (fun sc -> sc.AddControllers())
-        |> (fun mvc -> mvc.AddJsonOptions (fun options -> options.JsonSerializerOptions.Converters.Add (JsonStringEnumConverter()) ))
+            .AddControllers()
+            .AddJsonOptions(fun options -> options.JsonSerializerOptions.Converters.Add(JsonStringEnumConverter()))
         |> ignore
 
         services
@@ -51,33 +52,37 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
 
     abstract Configure : IApplicationBuilder -> IHostEnvironment -> unit
     default __.Configure appBuilder hostEnv =
-        appBuilder
-        |> (fun app -> if (not <| hostEnv.IsDevelopment ()) then app else app.UseDeveloperExceptionPage() |> ignore; app)
-        |> (fun app -> app.UseDefaultFiles ())
-        |> (fun app -> app.UseStaticFiles  ())
-        |> (fun app -> app.UseHttpsRedirection    ())
-        |> (fun app -> app.UseSwagger             ())
-        |> (fun app -> app.UseSwaggerUI (fun options ->
-            options.SwaggerEndpoint ("/swagger/v1/swagger.json", (sprintf "%s %s" apiInfo.Title apiInfo.Version))))
-        |> (fun app -> app.UseResponseCompression ())
-        |> (fun app -> app.UseRouting             ())
-        |> (fun app -> app.UseAuthorization       ())
-        |> (fun app -> app.UseEndpoints (fun endpoints -> endpoints.MapControllers() |> ignore))
+        let swaggerUri  = "/swagger/v1/swagger.json"
+        let swaggerName = sprintf "%s %s" apiInfo.Title apiInfo.Version
+
+        let builder =
+            match hostEnv.IsDevelopment() with
+            | false -> appBuilder
+            | true  -> appBuilder.UseDeveloperExceptionPage()
+
+        builder
+            .UseDefaultFiles()
+            .UseStaticFiles()
+            .UseHttpsRedirection()
+            .UseSwagger()
+            .UseSwaggerUI(fun options -> options.SwaggerEndpoint(swaggerUri, swaggerName))
+            .UseResponseCompression()
+            .UseRouting()
+            .UseAuthorization()
+            .UseEndpoints(fun endpoints -> endpoints.MapControllers() |> ignore)
         |> ignore
 
     abstract ConfigureWebHost : IWebHostBuilder -> IWebHostBuilder
     default this.ConfigureWebHost builder =
-        let applicationName = Assembly.GetEntryAssembly().GetName().Name
-
         builder
-        |> (fun b -> b.Configure (fun ctx app -> this.Configure app (ctx.HostingEnvironment)))
-        |> (fun b -> b.UseSetting (WebHostDefaults.ApplicationKey, applicationName))
+        |> (fun b -> b.Configure(fun ctx app -> this.Configure app ctx.HostingEnvironment))
+        |> (fun b -> b.UseSetting(WebHostDefaults.ApplicationKey, Assembly.GetEntryAssembly().GetName().Name))
 
     abstract ConfigureWebApiHost : IHostBuilder -> IHostBuilder
     default this.ConfigureWebApiHost builder =
         builder
-        |> (fun b -> b.ConfigureWebHostDefaults(fun _b -> this.ConfigureWebHost _b |> ignore))
-        |> (fun b -> b.ConfigureServices(fun hostBuilderContext _ -> this.SetConfigurationObject hostBuilderContext |> ignore))
-        |> (fun b -> b.ConfigureServices(fun hostBuilderContext services -> this.ConfigureServices hostBuilderContext services |> ignore))
+            .ConfigureWebHostDefaults(fun _b -> this.ConfigureWebHost _b |> ignore)
+            .ConfigureServices(fun hostBuilderContext _ -> this.SetConfigurationObject hostBuilderContext |> ignore)
+            .ConfigureServices(fun hostBuilderContext services -> this.ConfigureServices hostBuilderContext services |> ignore)
 end
 
