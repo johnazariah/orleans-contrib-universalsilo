@@ -31,12 +31,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.13.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.14.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.3.3" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.3.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.4.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.4.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,11 +56,11 @@
 
   <ItemGroup>
     <PackageReference Include="Orleans.Clustering.Kubernetes" Version="1.2.2" />
-    <PackageReference Include="Orleans.Persistence.CosmosDB" Version="3.0.2" />
+    <PackageReference Include="Orleans.Persistence.CosmosDB" Version="3.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OrleansDashboard" Version="3.0.8" />
+    <PackageReference Include="OrleansDashboard" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
