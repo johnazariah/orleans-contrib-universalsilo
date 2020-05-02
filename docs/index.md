@@ -7,34 +7,70 @@ In practice, however, this flexibility may present a beginner with too many choi
 
 This does not have to be the case at all! Orleans does _not_, in reality, require a steep learning curve.
 
-This library attempts to provide a simple, boilerplate free foundation on which to get started with Orleans, with sensible defaults and extension points, allowing a developer to focus on grain design and testing whilst providing opinionated guidance around the real-world concerns of configuration, packaging, service presentation and deployment.
+This library attempts to provide a simple, boilerplate free foundation on which to get started with Orleans, with pragmatic defaults and extension points, allowing a developer to focus on grain design and testing whilst providing opinionated guidance around the real-world concerns of configuration, packaging, service presentation and deployment.
 
-The philosophy behind this library is to:
+[Read more about the design philosophy here](intro-philosophy.md)
 
-* **Abstract away as much boilerplate as possible** without sacrificing flexibility for evolution
+Using this library is best done by interacting with the working bits published to Nuget. This will allow you to focus on building Orleans applications in your choice of idiomatic C# or F# with the least ceremony.
 
-* **Provide sensible defaults** without preventing the defaults being overridden
+Getting started is easy. [Follow the QuickStart Guide:](intro-quickstart.md)
 
-* **Make grain design the focus** of the development experience
+**1. Install the templates**
 
-* **Support Grain Testing** as a first class concern
+```shell
+dotnet new --install Orleans.Contrib.UniversalSilo.Templates
+```
 
-* **Support Cross-Platform** as a first class concern
-    * Build on .net core
+**2. Create an application with a name like `HelloOrleansWorld`.**
 
-* **Support CI/CD** as a first class concern
-    * Provide uniform building instructions for local development _and_ build pipelines
-    * Provide uniform packaging instructions for application executables _and_ Docker images
+```shell
+$ dotnet new orleans-webapi --name HelloOrleansWorld
+The template "Orleans: WebAPI Direct Client" was created successfully.
+```
 
-* **Support Azure Deployment** as opinionated guidance.
+This will create a fully-functional **C#** application in the `HelloOrleansWorld` folder.
 
-    **_Contributions for guidance on other platforms are welcome!_**
-    * Deployment as Azure App Service with a Site Plan on Scale Sets
-    * Deployment on Azure Kubernetes Service on Scale Sets
+You can also choose to generate the project in **F#** by using the following command:
 
-The documentation is structured as follows:
+```shell
+$ dotnet new orleans-webapi --name HelloOrleansWorld --language F#
+The template "Orleans: WebAPI Direct Client" was created successfully.
+```
 
-- [The Development Process](development.md)
-- [Configuration](configuration.md)
-- [Building and Packaging](building-and-packaging.md)
-- [Deployment](deployment.md)
+## Table of Contents
+### Setup Environment
+- [Setting up the Development Environment](setup-environment-setup.md)
+
+### First Steps
+- [Installing the Orleans UniversalSilo Templates](first-install-templates.md)
+- [Creating a Silo with a WebAPI interface](first-create-application.md)
+- [Simple Configuration](config-simple-configuration.md)
+
+### Running Your Application
+- [Running from Visual Studio](running-visualstudio.md)
+- [Running from the command-line](running-commandline.md)
+- Running with Tye
+
+### Developing Your Application
+- [Defining Grains](grain-development.md)
+- [Testing Grains](grain-testing.md)
+
+### Configuring Your Application
+- Configuration Order
+
+### Extending Your Application
+- Extending the Silo
+- Extending the Webapi FrontEnd
+- Extending the Client
+
+### Building and Packaging Your Application
+- As a .NET Core Application
+- As a Docker Image
+
+### Deploying Your Application
+- On AKS
+- Using Tye
+
+### CI/CD
+- On Github
+- On Azure Pipelines
