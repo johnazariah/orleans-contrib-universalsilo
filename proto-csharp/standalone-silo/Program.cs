@@ -8,6 +8,10 @@ namespace Template.StandaloneSilo
     /// </summary>
     class SiloConfigurator : Orleans.Contrib.UniversalSilo.SiloConfigurator
     {
+        public override SiloConfiguration SiloConfiguration =>
+            base.SiloConfiguration
+            .With(_c => _c.ServiceId = "Template");
+
         public SiloConfigurator() : base()
         { }
     }

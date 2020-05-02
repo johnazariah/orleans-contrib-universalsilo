@@ -22,20 +22,13 @@ module Keys =
 
     let [<Literal>] ENV_CLUSTER_MODE                           = "ENV_CLUSTER_MODE"
     let [<Literal>] ENV_CLUSTER_AZURE_STORAGE                  = "ENV_CLUSTER_AZURE_STORAGE"
+    let [<Literal>] ENV_CLUSTERING_DEV_STORAGE                 = "ENV_CLUSTERING_DEV_STORAGE"
 
     let [<Literal>] ENV_PERSISTENCE_MODE                       = "ENV_PERSISTENCE_MODE"
-    let [<Literal>] ENV_PERSISTENCE_AZURE_TABLE                = "ENV_PERSISTENCE_AZURE_TABLE"
-    let [<Literal>] ENV_PERSISTENCE_AZURE_BLOB                 = "ENV_PERSISTENCE_AZURE_BLOB"
+    let [<Literal>] ENV_PERSISTENCE_AZURE_STORAGE              = "ENV_PERSISTENCE_AZURE_STORAGE"
+    let [<Literal>] ENV_PERSISTENCE_DEV_STORAGE                = "ENV_PERSISTENCE_DEV_STORAGE"
 
     let [<Literal>] ENV_APPINSIGHTS_KEY                        = "APPINSIGHTS_INSTRUMENTATIONKEY"
-
-    let [<Literal>] ENV_DATA_STORAGE_CONNECTION_STRING         = "ENV_DATA_STORAGE_CONNECTION_STRING"
-    let [<Literal>] ENV_DATA_STORAGE_COLLECTION_NAME           = "ENV_DATA_STORAGE_COLLECTION_NAME"
-
-    let [<Literal>] ENV_DEFAULT_CLUSTER_AZURE_STORAGE          = "ENV_DEFAULT_CLUSTER_AZURE_STORAGE"
-    let [<Literal>] ENV_DEFAULT_PERSISTENCE_AZURE_TABLE        = "ENV_DEFAULT_PERSISTENCE_AZURE_TABLE"
-    let [<Literal>] ENV_DEFAULT_PERSISTENCE_AZURE_BLOB         = "ENV_DEFAULT_PERSISTENCE_AZURE_BLOB"
-    let [<Literal>] ENV_DEFAULT_DATA_STORAGE_CONNECTION_STRING = "ENV_DEFAULT_DATA_STORAGE_CONNECTION_STRING"
 
 [<AutoOpen>]
 module Enumerations =
@@ -49,7 +42,6 @@ module Enumerations =
     | InMemory             = 0
     | AzureTable           = 1
     | AzureBlob            = 2
-    //| CosmosDB             = 3
 
 module StringOps =
     let [<Literal>] TruncatedLength = 16
@@ -133,6 +125,12 @@ module Extensions =
     let [<Extension>] inline ApplyAppConfiguration (_this : IHostBuilder) =
         _this.ApplyAppConfiguration()
 
+    let [<Extension>] inline Apply (_this : 'a) (func : Func<'a, 'a>) : 'a =
+        func.Invoke _this
+
+    let [<Extension>] inline With (_this : 'a) (action : Action<'a>) : 'a =
+        action.Invoke _this
+        _this
 
 [<AutoOpen>]
 module Configuration =
@@ -146,7 +144,7 @@ module Configuration =
 
         member private this.AzureClusteringConnectionString def =
             def
-            |> this.[ENV_DEFAULT_CLUSTER_AZURE_STORAGE].StringOrDefault
+            |> this.[ENV_CLUSTERING_DEV_STORAGE].StringOrDefault
             |> this.[ENV_CLUSTER_AZURE_STORAGE].StringOrDefault
 
         // storage provider settings
@@ -154,15 +152,10 @@ module Configuration =
             def
             |> this.[ENV_PERSISTENCE_MODE].EnumOrDefault
 
-        member private this.AzureTableStorageConnectionString def =
+        member private this.AzureStorageConnectionString def =
             def
-            |> this.[ENV_DEFAULT_PERSISTENCE_AZURE_TABLE].StringOrDefault
-            |> this.[ENV_PERSISTENCE_AZURE_TABLE].StringOrDefault
-
-        member private this.AzureBlobStorageConnectionString def =
-            def
-            |> this.[ENV_DEFAULT_PERSISTENCE_AZURE_BLOB].StringOrDefault
-            |> this.[ENV_PERSISTENCE_AZURE_BLOB].StringOrDefault
+            |> this.[ENV_PERSISTENCE_DEV_STORAGE].StringOrDefault
+            |> this.[ENV_PERSISTENCE_AZURE_STORAGE].StringOrDefault
 
         // silo settings
         member private this.ClusterId       def = def |> this.[ENV_CLUSTER_ID].StringOrDefault
@@ -259,12 +252,9 @@ module Configuration =
             localConfiguration.PersistenceMode  <- config.PersistenceMode localConfiguration.PersistenceMode
             let connectionString =
                 match localConfiguration.PersistenceMode with
-                | PersistenceModes.AzureTable ->
-                    logger.LogInformation("Obtained ConnectionString from Envirornment because PersistenceMode is AzureTable")
-                    config.AzureTableStorageConnectionString localConfiguration.ConnectionString
-                | PersistenceModes.AzureBlob ->
-                    logger.LogInformation("Obtained ConnectionString from Envirornment because PersistenceMode is AzureBlob")
-                    config.AzureBlobStorageConnectionString  localConfiguration.ConnectionString
+                | PersistenceModes.AzureTable | PersistenceModes.AzureBlob ->
+                    logger.LogInformation("Obtained ConnectionString from Envirornment because PersistenceMode is {PersistenceMode}", localConfiguration.PersistenceMode)
+                    config.AzureStorageConnectionString localConfiguration.ConnectionString
                 | _ | PersistenceModes.InMemory ->
                     logger.LogInformation("Blanking connection string because PersistenceMode is {PersistenceMode}", localConfiguration.PersistenceMode)
                     String.Empty
