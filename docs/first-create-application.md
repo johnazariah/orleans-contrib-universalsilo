@@ -267,9 +267,9 @@ This window is where any failures or exceptions are displayed, so it's worth kee
 
 #### Accessing the API via Swagger
 
-Once the application has been stood up, you can access the WebAPI interface with your browser. The application stands up a Swagger endpoint out of the box, so point your browser to https://localhost:5001 or whatever port your application says it's listening on in the diagnostics.
+Once the application has been stood up, you can access the WebAPI interface with your browser. The application stands up a Swagger endpoint out of the box, so point your browser to https://localhost:5001/swagger/index.html or whatever port your application says it's listening on in the diagnostics.
 
-Once there, you will see a simple calculator service API exposed - a GET endpoint that adds two numbers. Play around with it and recognize that the functionality you are seeing is from the demo Calculator grain.
+This will bring up the API for a simple calculator service: a GET endpoint that adds two numbers. Play around with it and recognize that the functionality you are seeing is from the demo Calculator grain.
 
 The Swagger endpoint generates a platform-agnostic description of the service, and there are several tools available to generate client-access libraries automatically from the endpoint, so exposing the endpoint enables you to create a wide variety of client applications that can interact with this service. [Read more here.](https://swagger.io/tools/)
 
