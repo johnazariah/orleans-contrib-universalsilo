@@ -176,8 +176,6 @@ info: SiloConfigurator[0]
       Configuring Endpoints and Silo Address for clustering mode HostLocal [127.0.0.1:(11111, 30000)]
 info: SiloConfigurator[0]
       Configuring Persistence for InMemory []
-info: SiloConfigurator[0]
-      No dashboard available for clustering mode HostLocal
 ...
 ...
 -------------- Started silo S127.0.0.1:11111:325957930, ConsistentHashCode 26F31827 --------------

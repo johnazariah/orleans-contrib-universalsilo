@@ -124,17 +124,10 @@ type SiloConfigurator() = class
 
     abstract ConfigureDashboard : IConfiguration -> UniversalSiloConfiguration -> ISiloBuilder -> ISiloBuilder
     default __.ConfigureDashboard configuration siloSettings siloBuilder =
-        match siloSettings.ClusteringConfiguration.ClusteringMode with
-        | ClusteringModes.HostLocal ->
-            logger.LogInformation(
-                "No dashboard available for clustering mode {ClusteringMode}",
-                siloSettings.ClusteringConfiguration.ClusteringMode)
-            siloBuilder
-        | _ ->
-            logger.LogInformation(
-                "Starting dashboard for clustering mode {ClusteringMode}",
-                siloSettings.ClusteringConfiguration.ClusteringMode);
-            siloBuilder.UseDashboard();
+        logger.LogInformation(
+            "Starting dashboard for clustering mode {ClusteringMode}",
+            siloSettings.ClusteringConfiguration.ClusteringMode);
+        siloBuilder.UseDashboard();
 
     abstract ConfigureProcessExitHandlingOptions : IConfiguration -> UniversalSiloConfiguration -> ISiloBuilder -> ISiloBuilder
     default __.ConfigureProcessExitHandlingOptions configuration siloSettings siloBuilder =

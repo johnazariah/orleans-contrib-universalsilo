@@ -6,9 +6,7 @@ open System.Threading.Tasks
 open Template.Contract
 
 
-/// <summary>
 /// This is the service that will host your client application.
-/// </summary>
 type ClientService(applicationLifetime, clusterClient) = class
     inherit HostedServiceBase (applicationLifetime, clusterClient)
 
@@ -21,8 +19,15 @@ type ClientService(applicationLifetime, clusterClient) = class
         Task.CompletedTask
 end
 
-/// <summary>
-///
+/// This is the configuration class that you can use to override configuration
+type ClientConfiguration() = class
+    inherit ClientConfiguration<ClientService>()
+
+    override __.SiloConfiguration =
+        base.SiloConfiguration.ServiceId <- "Template"
+        base.SiloConfiguration
+end
+
 /// This is the entry point to the client.
 ///
 /// No changes should normally be needed here to get a running client finding and talking to a silo
@@ -32,14 +37,12 @@ end
 ///    * Setting environment variables,
 ///    * Providing a `clustering.json` file
 ///    * Overriding `ClientConfiguration` and appropriate methods on it
-///
-/// </summary>
 module Program =
     [<EntryPoint>]
     let Main args =
-        ClientConfiguration<ClientService> ()
-        |> (fun cc -> cc.GetHostBuilder args)
-        |> (fun hb -> hb.RunConsoleAsync ())
+        ClientConfiguration()
+            .GetHostBuilder(args)
+            .RunConsoleAsync()
         |> Async.AwaitTask
         |> Async.RunSynchronously
 

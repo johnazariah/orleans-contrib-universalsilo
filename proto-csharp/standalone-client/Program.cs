@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Orleans;
 using Orleans.Contrib.UniversalSilo.ClusterClient;
+using Orleans.Contrib.UniversalSilo.Configuration;
 using System;
 using System.Threading.Tasks;
 using Template.Contract;
@@ -12,6 +13,7 @@ namespace Template.StandaloneClient
     /// </summary>
     class ClientService : HostedServiceBase
     {
+
         // These parameters are dependency injected, and passed to the base class to expose as properties.
         // <param name="applicationLifetime">This is exposed as the `ApplicationLifetime` property</param>
         // <param name="clusterClient">This is exposed as the `ClusterClient` property</param>
@@ -41,6 +43,13 @@ namespace Template.StandaloneClient
         }
     }
 
+    class ClientConfiguration : ClientConfiguration<ClientService>
+    {
+        public override SiloConfiguration SiloConfiguration =>
+            base.SiloConfiguration
+            .With(_c => _c.ServiceId = "Template");
+    }
+
     /// <summary>
     ///
     /// This is the entry point to the client.
@@ -57,7 +66,7 @@ namespace Template.StandaloneClient
     class Program
     {
         static async Task Main(string[] args) =>
-            await new ClientConfiguration<ClientService>()
+            await new ClientConfiguration()
                 .GetHostBuilder(args)
                 .RunConsoleAsync();
     }

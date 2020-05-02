@@ -28,23 +28,21 @@ module OpenApiConfiguration =
             Contact = Contact,
             License = License)
 
-/// <summary>
 /// Override methods in this class to take over how the web-api host is configured
-/// </summary>
 type WebApiConfigurator() = class
     inherit Orleans.Contrib.UniversalSilo.WebApiConfigurator(OpenApiConfiguration.ApiInfo)
 end
 
-/// <summary>
 /// Override methods in this class to take over how the silo is configured
-/// </summary>
 type SiloConfigurator () = class
     inherit Orleans.Contrib.UniversalSilo.SiloConfigurator()
+
+    override __.SiloConfiguration =
+        base.SiloConfiguration.ServiceId <- "Template"
+        base.SiloConfiguration
 end
 
 module Program =
-    /// <summary>
-    ///
     /// This is the entry point to the silo.
     ///
     /// No changes should normally be needed here to start up a silo and a web-api front-end co-hosted in the same executable
@@ -56,8 +54,6 @@ module Program =
     ///    * Providing a `persistence.json` file to configure storage provider options
     ///    * Overriding methods in the `WebApiConfigurator` class
     ///    * Overriding methods in the `SiloConfigurator` class
-    ///
-    /// </summary>
     [<EntryPoint>]
     let Main args =
         (Host.CreateDefaultBuilder args)
