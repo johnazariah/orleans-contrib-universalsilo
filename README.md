@@ -1,6 +1,7 @@
 # Orleans UniversalSilo
 
 ![CI](https://github.com/johnazariah/orleans-contrib-universalsilo/workflows/CI/badge.svg)
+ [![NuGet Package](https://img.shields.io/nuget/v/Orleans.Contrib.UniversalSilo.Templates.svg)](https://www.nuget.org/packages/Orleans.Contrib.UniversalSilo.Templates/)
 
 Orleans is a flexible platform for building distributed applications.
 

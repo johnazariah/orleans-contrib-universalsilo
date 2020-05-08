@@ -53,14 +53,11 @@ clean-templates :
 clean-packages :
 	- rm *.nupkg
 
-build : build.csharp build.fsharp
+build :
+	dotnet restore            orleans-template-dev.sln
+	dotnet build --no-restore orleans-template-dev.sln
+	dotnet test  --no-build   orleans-template-dev.sln
 	@echo Done Building Projects
-
-build.% :
-	@echo Building $* Solution
-	dotnet restore            orleans-template-dev-$*.sln
-	dotnet build --no-restore orleans-template-dev-$*.sln
-	dotnet test  --no-build   orleans-template-dev-$*.sln
 
 templates-all : clean-templates pack-template-pack install-template-pack test-projects
 
