@@ -103,7 +103,7 @@ type ClientConfiguration() = class
     default __.ConfigureAppConfiguration _ configBuilder =
         configBuilder
             .SetBasePath(Directory.GetCurrentDirectory ())
-            .AddJsonFile("clustering.json", optional = true, reloadOnChange = false)
+            .AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly())
         |> ignore
 
     abstract ConfigureServicesCore : HostBuilderContext -> IServiceCollection -> unit

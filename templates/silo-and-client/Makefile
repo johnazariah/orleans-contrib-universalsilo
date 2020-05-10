@@ -26,12 +26,11 @@ acr=local
 
 # Initialize
 init :
-	git init
-	git add .
-	git commit -m "Initial commit of Template"
+	$(MAKE) -f $(silo).Makefile   $@
+	$(MAKE) -f $(client).Makefile $@
 
 # .NET commands
-dotnet-clean dotnet-restore dotnet-build dotnet-test dotnet-publish dotnet-run:
+dotnet-secrets-init dotnet-clean dotnet-restore dotnet-build dotnet-test dotnet-publish dotnet-run:
 	$(MAKE) -f $(silo).Makefile   $@
 	$(MAKE) -f $(client).Makefile $@
 

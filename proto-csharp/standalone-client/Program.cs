@@ -56,11 +56,12 @@ namespace Template.StandaloneClient
     ///
     /// No changes should normally be needed here to get a running client finding and talking to a silo
     ///
-    /// Provide the configuration of the silo to connect by any combination of
-    ///    * Working with the default configuration
-    ///    * Setting environment variables,
-    ///    * Providing a `clustering.json` file
-    ///    * Overriding `ClientConfiguration` and appropriate methods on it
+    /// Provide the configuration of the silo to connect by any combination of (in order of override)
+    ///    * The default configuration
+    ///    * Overriding in the <see cref="ClientConfiguration"/> class
+    ///    * Providing a section in the "appSettings.json"/> file. (If at all possible, do not use this option.)
+    ///    * Setting user secrets for managing secrets and connection strings in development
+    ///    * Setting environment variables
     ///
     /// </summary>
     class Program
