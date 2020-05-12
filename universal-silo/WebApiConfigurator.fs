@@ -12,6 +12,9 @@ open System.IO.Compression
 open System.Reflection
 open System.Text.Json.Serialization
 open Microsoft.Extensions.Configuration
+open Microsoft.AspNetCore.Diagnostics.HealthChecks
+open Microsoft.Extensions.Diagnostics.HealthChecks
+open Microsoft.AspNetCore.Http
 
 [<AbstractClass>]
 type WebApiConfigurator (apiInfo : OpenApiInfo) = class
@@ -39,6 +42,18 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
             .Configure(fun (options : GzipCompressionProviderOptions) ->
                 options.Level <- CompressionLevel.Optimal);
 
+    abstract ConfigureHealthChecks : HostBuilderContext -> IServiceCollection -> IServiceCollection
+    default __.ConfigureHealthChecks hostBuilderContext services =
+        services
+            .AddHealthChecks()
+            .AddCheck<ClusterHealthCheck>(nameof(ClusterHealthCheck))
+            .AddCheck<LocalHealthCheck>(nameof(LocalHealthCheck))
+            .AddCheck<StorageHealthCheck>(nameof(StorageHealthCheck))
+            .AddCheck<SiloHealthCheck>(nameof(SiloHealthCheck))
+        |> ignore
+
+        services
+
     abstract ConfigureServices : HostBuilderContext -> IServiceCollection -> IServiceCollection
     default this.ConfigureServices hostBuilderContext services =
         services
@@ -60,6 +75,14 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
             | false -> appBuilder
             | true  -> appBuilder.UseDeveloperExceptionPage()
 
+        let healthResultStatusCodes =
+            [
+                (HealthStatus.Healthy,   StatusCodes.Status200OK);
+                (HealthStatus.Degraded,  StatusCodes.Status200OK);
+                (HealthStatus.Unhealthy, StatusCodes.Status503ServiceUnavailable)
+            ]
+            |> dict
+
         builder
             .UseDefaultFiles()
             .UseStaticFiles()
@@ -69,7 +92,17 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
             .UseResponseCompression()
             .UseRouting()
             .UseAuthorization()
-            .UseEndpoints(fun endpoints -> endpoints.MapControllers() |> ignore)
+            .UseEndpoints(fun endpoints ->
+                endpoints.MapControllers()
+                |> ignore
+
+                endpoints.MapHealthChecks(
+                    "/health",
+                    new HealthCheckOptions(
+                        AllowCachingResponses = false,
+                        ResultStatusCodes = healthResultStatusCodes
+                    ))
+                |> ignore)
         |> ignore
 
     abstract ConfigureWebHost : IWebHostBuilder -> IWebHostBuilder
@@ -82,7 +115,8 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
     default this.ConfigureWebApiHost builder =
         builder
             .ConfigureWebHostDefaults(fun _b -> this.ConfigureWebHost _b |> ignore)
-            .ConfigureServices(fun hostBuilderContext _ -> this.SetConfigurationObject hostBuilderContext |> ignore)
-            .ConfigureServices(fun hostBuilderContext services -> this.ConfigureServices hostBuilderContext services |> ignore)
+            .ConfigureServices(fun hostBuilderContext _        -> this.SetConfigurationObject hostBuilderContext          |> ignore)
+            .ConfigureServices(fun hostBuilderContext services -> this.ConfigureHealthChecks  hostBuilderContext services |> ignore)
+            .ConfigureServices(fun hostBuilderContext services -> this.ConfigureServices      hostBuilderContext services |> ignore)
 end
 

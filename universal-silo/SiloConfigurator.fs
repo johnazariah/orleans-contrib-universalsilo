@@ -1,6 +1,7 @@
 ﻿namespace Orleans.Contrib.UniversalSilo
 
 open Microsoft.Extensions.Configuration
+open Microsoft.AspNetCore.Diagnostics.HealthChecks
 open Microsoft.Extensions.Logging
 open Orleans
 open Orleans.Configuration
