@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build-and-test-solutions-and-templates:
+  build-and-test-solutions:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -15,5 +15,30 @@ jobs:
       uses: actions/setup-dotnet@v1
     - name: build-and-test-solutions
       run: make build
+    - name: build-template-pack
+      run: make copy-template-pack pack-template-pack
+    - name: upload-template-pack
+      uses: actions/upload-artifact@v2
+      with:
+        name: template-pack
+        path: Orleans.Contrib.UniversalSilo.Templates.*.nupkg
+  verify-templates:
+    needs: build-and-test-solutions
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lang: [csharp, fsharp]
+        template: [webapi, silo, client, silo-and-client]
+      fail-fast: false
+      max-parallel: 8
+    steps:
+    - name: setup-git-user
+      run: make setup-git-user
+    - name: download-template-pack
+      uses: actions/download-artifact@v2
+      with:
+        name: template-pack
+    - name: install-template-pack
+      run: make install-template-pack
     - name: verify-templates
-      run: make templates-all
+      run: make test-template.${{ matrix.template }}.${{ matrix.lang }}
