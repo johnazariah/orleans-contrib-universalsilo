@@ -54,13 +54,12 @@ namespace Template.WebApiDirectClient
     ///
     /// No changes should normally be needed here to start up a silo and a web-api front-end co-hosted in the same executable
     ///
-    /// Provide the configuration of the silo to connect by any combination of
-    ///    * Working with the default configuration
-    ///    * Setting environment variables,
-    ///    * Providing a `clustering.json` file to configure clustering options
-    ///    * Providing a `persistence.json` file to configure storage provider options
-    ///    * Overriding methods in the `WebApiConfigurator` class
-    ///    * Overriding methods in the `SiloConfigurator` class
+    /// Provide the configuration of the silo to connect by any combination of (in order of override)
+    ///    * The default configuration
+    ///    * Overriding in the <see cref="SiloConfigurator"/> and <see cref="WebApiConfigurator"/>classes
+    ///    * Providing a section in the "appSettings.json"/> file. (If at all possible, do not use this option.)
+    ///    * Setting user secrets for managing secrets and connection strings in development
+    ///    * Setting environment variables
     ///
     /// </summary>
     class Program

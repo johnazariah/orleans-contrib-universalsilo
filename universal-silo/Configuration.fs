@@ -112,8 +112,7 @@ module Extensions =
             this.ConfigureHostConfiguration (fun cb ->
                 cb
                     .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("clustering.json",  optional = true, reloadOnChange = false)
-                    .AddJsonFile("persistence.json", optional = true, reloadOnChange = false)
+                    .AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly())
                 |> ignore)
 
         member this.ApplyConfiguration f =

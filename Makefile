@@ -95,6 +95,8 @@ copy-template.silo-and-client : copy-template.% : copy-common.%
 	$(MAKE) source=$(proto_root)-$(suffix)/standalone-client target=$(output_root)/$*-$(suffix)/Template.Client copy
 	$(MAKE) src_project_file=standalone-silo/standalone-silo.$(projsuffix)     dest_project_file=$*-$(suffix)/Template.Silo/Template.Silo.$(projsuffix)     replace-project-reference-with-nuget-reference
 	$(MAKE) src_project_file=standalone-client/standalone-client.$(projsuffix) dest_project_file=$*-$(suffix)/Template.Client/Template.Client.$(projsuffix) replace-project-reference-with-nuget-reference
+	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Silo.Makefile    template=$* replace-pattern
+	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Client.Makefile  template=$* replace-pattern
 
 copy-common.% : copy-grains.% copy-grain-tests.% copy-templates.% copy-ignores.%
 	@echo Copied Common Components For $* [$(suffix)]
@@ -166,7 +168,7 @@ test-projects.% :
 	- $(MAKE) suffix=$* test-project.webapi test-project.silo test-project.client test-project.silo-and-client
 
 test-project.% : create-scratch-project.%
-	$(MAKE) -C $(scratch_root)/$(suffix)/$*/ dotnet-build dotnet-test
+	$(MAKE) -C $(scratch_root)/$(suffix)/$*/ init dotnet-build dotnet-test
 	@echo Tested Project $* [$(suffix)]
 
 create-scratch-project.% :

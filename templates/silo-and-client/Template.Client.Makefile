@@ -22,12 +22,18 @@ image_tag = $(git_branch).$(git_latest_hash)
 container_name:= $(acr)/$(project-lc):$(image_tag)
 
 # Initialize
-init :
+init : dotnet-secrets-init git-init
+	git status
+
+git-init :
 	git init
 	git add .
 	git commit -m "Initial commit of Template"
 
 # .NET commands
+dotnet-secrets-init :
+	dotnet user-secrets init --project $(project)/$(project)._PROJ_SUFFIX_
+
 dotnet-publish :
 	dotnet publish --no-build $(project)/$(project)._PROJ_SUFFIX_ -c $(config) -o out/$(project)
 	@echo Built DotNet projects

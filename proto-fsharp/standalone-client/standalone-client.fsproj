@@ -6,18 +6,6 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup Condition="Exists('..\clustering.json')">
-    <Content Include="..\clustering.json" Link="clustering.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup Condition="Exists('..\persistence.json')">
-    <Content Include="..\persistence.json" Link="persistence.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.1" />
   </ItemGroup>
