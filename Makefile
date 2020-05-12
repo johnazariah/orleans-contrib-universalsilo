@@ -208,7 +208,7 @@ test-template.% :
 	$(MAKE) lang=$(lang) template=$(template) test-scratch-project
 
 test-scratch-project : create-scratch-project
-	$(MAKE) -C $(test_install_root)/$(lang)/$(template)/ init dotnet-build dotnet-test
+	$(MAKE) -C $(test_install_root)/$(lang)/$(template)/ dotnet-secrets-init dotnet-build dotnet-test
 
 create-scratch-project :
 	mkdir -p $(test_install_root)
