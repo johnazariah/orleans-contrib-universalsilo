@@ -11,7 +11,7 @@ type ClientService(applicationLifetime, clusterClient) = class
     inherit HostedServiceBase (applicationLifetime, clusterClient)
 
     override __.ExecuteAsync () =
-        let (l, r) = (5, 6);
+        let (l, r) = (5, 6)
         let adder = base.ClusterClient.GetGrain<ICalculatorGrain> <| Guid.NewGuid()
         let result = adder.Add l r |> Async.AwaitTask |> Async.RunSynchronously
 

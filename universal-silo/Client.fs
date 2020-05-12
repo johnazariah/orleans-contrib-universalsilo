@@ -16,7 +16,7 @@ open System.Threading.Tasks
 open Orleans.Contrib.UniversalSilo.Configuration
 type HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext
 
-type ClusterClientHostedService(clusterClient : IClusterClient) = class
+type private ClusterClientHostedService(clusterClient : IClusterClient) = class
     interface IHostedService with
         member __.StartAsync (_: CancellationToken) : Task =
             Task.CompletedTask

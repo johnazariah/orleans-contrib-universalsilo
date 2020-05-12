@@ -30,7 +30,7 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
         let xmlPath = Path.Combine (AppDomain.CurrentDomain.BaseDirectory, xmlFile)
         services.AddSwaggerGen(fun options ->
             options.SwaggerDoc (apiInfo.Version, apiInfo)
-            options.EnableAnnotations();
+            options.EnableAnnotations()
             options.IncludeXmlComments(xmlPath))
 
     abstract AddResponseCompression : IServiceCollection -> IServiceCollection
@@ -40,7 +40,7 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
             .Configure(fun (options : BrotliCompressionProviderOptions) ->
                 options.Level <- CompressionLevel.Optimal)
             .Configure(fun (options : GzipCompressionProviderOptions) ->
-                options.Level <- CompressionLevel.Optimal);
+                options.Level <- CompressionLevel.Optimal)
 
     abstract ConfigureHealthChecks : HostBuilderContext -> IServiceCollection -> IServiceCollection
     default __.ConfigureHealthChecks hostBuilderContext services =
