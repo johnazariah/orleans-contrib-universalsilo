@@ -4,6 +4,8 @@
 # We'll need `make`: run `choco install make`
 
 # project name
+project:=Template
+project-lc:=$(shell powershell \"$(project)\".ToLower\(\))
 silo=Template.Silo
 client=Template.Client
 
@@ -30,7 +32,23 @@ init :
 	$(MAKE) -f $(client).Makefile $@
 
 # .NET commands
-dotnet-secrets-init dotnet-clean dotnet-restore dotnet-build dotnet-test dotnet-publish dotnet-run:
+dotnet-test :
+	dotnet test --no-build $(project).sln -c $(config)
+	@echo Built DotNet projects
+
+dotnet-build : dotnet-restore
+	dotnet build --no-restore $(project).sln -c $(config)
+	@echo Built DotNet projects
+
+dotnet-restore :
+	dotnet restore $(project).sln
+	@echo Built DotNet projects
+
+dotnet-clean:
+	- rm -rf out/$(project)
+	dotnet clean $(project).sln
+
+dotnet-secrets-init dotnet-publish dotnet-run:
 	$(MAKE) -f $(silo).Makefile   $@
 	$(MAKE) -f $(client).Makefile $@
 
