@@ -197,6 +197,7 @@ uninstall-template-pack :
 install-template-pack : uninstall-template-pack
 	dotnet new -i Orleans.Contrib.UniversalSilo.Templates.$(LibraryVersion).nupkg
 
+# Template Test Targets
 test-templates : $(foreach l,$(languages),$(foreach t,$(project-types),test-template.$(t).$(l)))
 	@echo Completed Testing Templates
 	@echo
