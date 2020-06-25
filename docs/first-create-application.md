@@ -113,7 +113,7 @@ The file will have its original line endings in your working directory
 ...
 The file will have its original line endings in your working directory
 git commit -m "Initial commit of HelloOrleansWorld"
-[master (root-commit) bfecd13] Initial commit of HelloOrleansWorld
+[main (root-commit) bfecd13] Initial commit of HelloOrleansWorld
  17 files changed, 954 insertions(+)
  create mode 100644 .dockerignore
  create mode 100644 .github/workflows/ci.yml
@@ -138,7 +138,7 @@ This should be the state after the previous command completes.
 
 ```shell
 $ git status
-On branch master
+On branch main
 nothing to commit, working tree clean
 ```
 
