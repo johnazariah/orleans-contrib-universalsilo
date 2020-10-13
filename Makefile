@@ -1,4 +1,4 @@
-LibraryVersion:=0.7.0
+LibraryVersion:=0.7.1
 NugetApiKey:=
 
 source:=
@@ -90,13 +90,13 @@ dn-clean-project :
 	- dotnet clean orleans-template-dev.sln
 
 dn-restore-project :
-	dotnet restore --force    orleans-template-dev.sln
+	dotnet restore --force orleans-template-dev.sln
 
 dn-build-project :
 	dotnet build --no-restore orleans-template-dev.sln
 
 dn-test-project :
-	dotnet test  --no-build   orleans-template-dev.sln
+	dotnet test --no-build orleans-template-dev.sln
 
 setup-templates : clean-template-pack copy-template-pack pack-template-pack install-template-pack
 	@echo Done Setting Up Templates
