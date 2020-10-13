@@ -82,12 +82,21 @@ clean : clean-packages clean-template-pack
 	@echo Done cleaning
 	@echo
 
-build :
-	dotnet restore            orleans-template-dev.sln
-	dotnet build --no-restore orleans-template-dev.sln
-	dotnet test  --no-build   orleans-template-dev.sln
+build : dn-clean-project dn-restore-project dn-build-project dn-test-project
 	@echo Done Building Projects
 	@echo
+
+dn-clean-project :
+	- dotnet clean orleans-template-dev.sln
+
+dn-restore-project :
+	dotnet restore --force    orleans-template-dev.sln
+
+dn-build-project :
+	dotnet build --no-restore orleans-template-dev.sln
+
+dn-test-project :
+	dotnet test  --no-build   orleans-template-dev.sln
 
 setup-templates : clean-template-pack copy-template-pack pack-template-pack install-template-pack
 	@echo Done Setting Up Templates
@@ -136,8 +145,10 @@ copy-single-template.silo-and-client : copy-single-template.% : copy-common.%
 	$(MAKE) source=$(proto_root)-$(lang)/standalone-client target=$(copy_target_root)/$*-$(lang)/Template.Client copy
 	$(MAKE) src_project_file=standalone-silo/standalone-silo.$(projsuffix)     dest_project_file=$*-$(lang)/Template.Silo/Template.Silo.$(projsuffix)     replace-project-reference-with-nuget-reference
 	$(MAKE) src_project_file=standalone-client/standalone-client.$(projsuffix) dest_project_file=$*-$(lang)/Template.Client/Template.Client.$(projsuffix) replace-project-reference-with-nuget-reference
-	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Silo.Makefile    template=$* replace-pattern
-	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Client.Makefile  template=$* replace-pattern
+	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Silo.Makefile      template=$* replace-pattern
+	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Client.Makefile    template=$* replace-pattern
+	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Silo.Dockerfile    template=$* replace-pattern
+	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Client.Dockerfile  template=$* replace-pattern
 
 copy-common.% : copy-grains.% copy-grain-tests.% copy-templates.% copy-ignores.%
 	@echo Copied Common Components For $* [$(lang)]
@@ -207,7 +218,12 @@ test-template.% : template=$(basename $*)
 test-template.% :
 	$(MAKE) lang=$(lang) template=$(template) test-scratch-project
 
-test-scratch-project : create-scratch-project
+test-scratch-project : create-scratch-project test-dotnet-flow test-docker-flow
+
+test-docker-flow :
+	$(MAKE) -C $(test_install_root)/$(lang)/$(template)/ docker-build
+
+test-dotnet-flow :
 	$(MAKE) -C $(test_install_root)/$(lang)/$(template)/ dotnet-secrets-init dotnet-build dotnet-test
 
 create-scratch-project :

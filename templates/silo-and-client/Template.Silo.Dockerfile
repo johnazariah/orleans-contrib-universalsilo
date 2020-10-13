@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 ARG config=Release
 COPY . "/src"
-RUN dotnet restore "/src/Template.Silo/Template.Silo._PROJ_SUFFIX_" -c ${config}
+RUN dotnet restore "/src/Template.Silo/Template.Silo._PROJ_SUFFIX_"
 RUN dotnet build --no-restore "/src/Template.Silo/Template.Silo._PROJ_SUFFIX_" -c ${config}
 RUN dotnet test --no-build "/src/Template.Silo/Template.Silo._PROJ_SUFFIX_" -c ${config}
 RUN dotnet publish --no-build  "/src/Template.Silo/Template.Silo._PROJ_SUFFIX_" -c ${config} -o /app
