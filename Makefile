@@ -103,14 +103,11 @@ setup-templates : clean-template-pack copy-template-pack pack-template-pack inst
 	@echo
 
 # Library Targets
-pack-library :
-	$(MAKE) project_path=universal-silo/universal-silo.fsproj package_name=Orleans.Contrib.UniversalSilo package_version=$(LibraryVersion) pack
-
-push-template-pack : pack-template-pack
-	$(MAKE)  package_name=Orleans.Contrib.UniversalSilo.Templates package_version=$(LibraryVersion) push
-
 push-library : pack-library
 	$(MAKE) package_name=Orleans.Contrib.UniversalSilo package_version=$(LibraryVersion) push
+
+pack-library :
+	$(MAKE) project_path=universal-silo/universal-silo.fsproj package_name=Orleans.Contrib.UniversalSilo package_version=$(LibraryVersion) pack
 
 # Clean Targets
 clean-packages :
@@ -118,6 +115,10 @@ clean-packages :
 
 clean-template-pack :
 	- rm -rf $(scratch)
+
+# Template Targets
+push-template-pack : clean-template-pack copy-template-pack pack-template-pack
+	$(MAKE) package_name=Orleans.Contrib.UniversalSilo.Templates package_version=$(LibraryVersion) push
 
 # Template Copy Targets
 copy-template-pack : $(foreach l,$(languages),$(foreach t,$(template-types),copy-template.$(t).$(l)))
