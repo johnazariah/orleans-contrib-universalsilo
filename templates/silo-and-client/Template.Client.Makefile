@@ -5,7 +5,7 @@
 
 # project name
 project:=Template.Client
-project-lc:=$(shell powershell \"$(project)\".ToLower\(\))
+project-lc:=$(shell echo $(project) | tr A-Z a-z)
 
 # project configuration
 config:=Debug

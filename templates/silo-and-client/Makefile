@@ -5,7 +5,7 @@
 
 # project name
 project:=Template
-project-lc:=$(shell powershell \"$(project)\".ToLower\(\))
+project-lc:=$(shell echo $(project) | tr A-Z a-z)
 silo=Template.Silo
 client=Template.Client
 
