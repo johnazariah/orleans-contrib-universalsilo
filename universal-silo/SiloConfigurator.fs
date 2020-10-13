@@ -1,7 +1,6 @@
 ﻿namespace Orleans.Contrib.UniversalSilo
 
 open Microsoft.Extensions.Configuration
-open Microsoft.AspNetCore.Diagnostics.HealthChecks
 open Microsoft.Extensions.Logging
 open Orleans
 open Orleans.Configuration
@@ -9,6 +8,8 @@ open Orleans.Hosting
 open Orleans.Contrib.UniversalSilo.Configuration
 open System
 open System.Net
+open Orleans.Clustering.AzureStorage
+open Orleans.Reminders.AzureStorage
 
 type HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext
 
@@ -130,21 +131,6 @@ type SiloConfigurator() = class
             siloSettings.ClusteringConfiguration.ClusteringMode);
         siloBuilder.UseDashboard();
 
-    abstract ConfigureProcessExitHandlingOptions : IConfiguration -> UniversalSiloConfiguration -> ISiloBuilder -> ISiloBuilder
-    default __.ConfigureProcessExitHandlingOptions configuration siloSettings siloBuilder =
-        let fastKillOnProcessExit =
-            match siloSettings.ClusteringConfiguration.ClusteringMode with
-            | ClusteringModes.Kubernetes | ClusteringModes.Docker -> true
-            | _ -> false
-
-        logger.LogInformation(
-            "`FastKillOnProcessExit = {FastKillOnProcessExit}` for clustering mode {ClusteringMode}",
-            fastKillOnProcessExit,
-            siloSettings.ClusteringConfiguration.ClusteringMode)
-
-        siloBuilder.Configure(fun (options : ProcessExitHandlingOptions) ->
-            options.FastKillOnProcessExit <- fastKillOnProcessExit)
-
     abstract ConfigureApplicationParts : ISiloBuilder -> ISiloBuilder
     default __.ConfigureApplicationParts siloBuilder =
         siloBuilder.ConfigureApplicationParts(fun parts ->
@@ -183,7 +169,6 @@ type SiloConfigurator() = class
         |> this.ConfigureStorageProvider            hostBuilderContext.Configuration configuration
         |> this.ConfigureApplicationInsights        hostBuilderContext.Configuration configuration
         |> this.ConfigureDashboard                  hostBuilderContext.Configuration configuration
-        |> this.ConfigureProcessExitHandlingOptions hostBuilderContext.Configuration configuration
         |> this.ConfigureApplicationParts
         |> ignore
 end
