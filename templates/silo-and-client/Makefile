@@ -48,7 +48,7 @@ dotnet-clean:
 	- rm -rf out/$(project)
 	dotnet clean $(project).sln
 
-dotnet-secrets-init dotnet-publish dotnet-run:
+dotnet-publish dotnet-run:
 	$(MAKE) -f $(silo).Makefile   $@
 	$(MAKE) -f $(client).Makefile $@
 
