@@ -228,6 +228,7 @@ deploy/
 out.csv
 
 # Orleans UniversalSilo stuff
+local-k8s-deployment.yml
 persistence.json
 clustering.json
 scratch/

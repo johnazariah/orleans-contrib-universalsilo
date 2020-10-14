@@ -5,6 +5,12 @@
 docker-compose.yml
 clustering.json
 persistence.json
+local-k8s-deployment.yml
+local-k8s-deployment.ymlt
+local-k8s-rbac.yml
+tye.yaml
+Makefile
+Dockerfile
 **/bin/
 **/obj/
 **/out/
