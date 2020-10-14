@@ -30,7 +30,7 @@ module OpenApiConfiguration =
 
 /// Override methods in this class to take over how the web-api host is configured
 type WebApiConfigurator() = class
-    inherit Orleans.Contrib.UniversalSilo.WebApiConfigurator(OpenApiConfiguration.ApiInfo)
+    inherit Orleans.Contrib.UniversalSilo.WebApiConfigurator(OpenApiConfiguration.ApiInfo, false)
 end
 
 /// Override methods in this class to take over how the silo is configured

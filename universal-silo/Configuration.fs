@@ -112,7 +112,6 @@ module Extensions =
             this.ConfigureHostConfiguration (fun cb ->
                 cb
                     .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly())
                 |> ignore)
 
         member this.ApplyConfiguration f =

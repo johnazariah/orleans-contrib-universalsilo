@@ -17,7 +17,7 @@ open Microsoft.Extensions.Diagnostics.HealthChecks
 open Microsoft.AspNetCore.Http
 
 [<AbstractClass>]
-type WebApiConfigurator (apiInfo : OpenApiInfo) = class
+type WebApiConfigurator (apiInfo : OpenApiInfo, useHttpsRedirection : bool) = class
     let mutable configuration : IConfiguration = null
     member val public Configuration = configuration
 
@@ -83,10 +83,11 @@ type WebApiConfigurator (apiInfo : OpenApiInfo) = class
             ]
             |> dict
 
+        if useHttpsRedirection then ignore <| builder.UseHttpsRedirection()
+
         builder
             .UseDefaultFiles()
             .UseStaticFiles()
-            .UseHttpsRedirection()
             .UseSwagger()
             .UseSwaggerUI(fun options -> options.SwaggerEndpoint(swaggerUri, swaggerName))
             .UseResponseCompression()

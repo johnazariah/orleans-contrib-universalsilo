@@ -31,7 +31,7 @@ namespace Template.WebApiDirectClient
                 },
             };
 
-        public WebApiConfigurator() : base(_apiInfo)
+        public WebApiConfigurator() : base(_apiInfo, false)
         { }
     }
 
