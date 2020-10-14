@@ -225,7 +225,7 @@ test-docker-flow :
 	$(MAKE) -C $(test_install_root)/$(lang)/$(template)/ docker-build
 
 test-dotnet-flow :
-	$(MAKE) -C $(test_install_root)/$(lang)/$(template)/ dotnet-secrets-init dotnet-build dotnet-test
+	$(MAKE) -C $(test_install_root)/$(lang)/$(template)/ dotnet-build dotnet-test
 
 create-scratch-project :
 	mkdir -p $(test_install_root)

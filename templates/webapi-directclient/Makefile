@@ -22,8 +22,11 @@ image_tag = $(git_branch).$(git_latest_hash)
 
 container_name:= $(acr)/$(project-lc):$(image_tag)
 
+# k8s namespace
+k8s_namespace=green
+
 # Initialize
-init : dotnet-secrets-init git-init
+init : git-init
 	git status
 
 git-init :
@@ -32,9 +35,6 @@ git-init :
 	git commit -m "Initial commit of Template"
 
 # .NET commands
-dotnet-secrets-init :
-	dotnet user-secrets init --project $(project)/$(project)._PROJ_SUFFIX_
-
 dotnet-publish :
 	dotnet publish --no-build $(project)/$(project)._PROJ_SUFFIX_ -c $(config) -o out/$(project)
 	@echo Built DotNet projects
@@ -108,3 +108,27 @@ docker-kill : docker-stop
 docker-clean : docker-kill
 	@echo Pruning all images
 	- docker image prune -af
+
+# Local Kubernetes Commands
+k8s-cleanup :
+	kubectl delete namespace $(k8s_namespace)
+
+k8s-deploy : k8s-create-namespace k8s-replace-image-tag
+	kubectl apply -f local-k8s-deployment.yml
+
+k8s-dashboard : k8s-deploy-dashboard k8s-setup-rbac
+	kubectl proxy
+
+k8s-create-namespace :
+	kubectl create namespace $(k8s_namespace)
+	kubectl config set-context --current --namespace $(k8s_namespace)
+
+k8s-replace-image-tag :
+	sed -e "s|{image-name}|$(container_name)|g" local-k8s-deployment-template.yml > local-k8s-deployment.yml
+
+k8s-deploy-dashboard : 
+	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+
+k8s-setup-rbac : 
+	kubectl apply -f local-k8s-rbac.yml
+	kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}')

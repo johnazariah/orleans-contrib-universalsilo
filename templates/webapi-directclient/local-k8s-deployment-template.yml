@@ -1,0 +1,74 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: template-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: template-pod
+  template:
+    metadata:
+      labels:
+        app: template-pod
+    spec:
+      containers:
+      - name: template-container
+        image: {image-name}
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+        # env:
+        #   - name: ENV_CLUSTER_AZURE_STORAGE
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: {storage-secret-name}
+        #         key: connection-string
+        #   - name: ENV_PERSISTENCE_AZURE_TABLE
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: {storage-secret-name}
+        #         key: connection-string
+        #   - name: ENV_DATA_STORAGE_CONNECTION_STRING
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: {storage-secret-name}
+        #         key: connection-string
+        #   - name: ENV_DATA_STORAGE_COLLECTION_NAME
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: {storage-secret-name}
+        #         key: collection-name
+        ports:
+        - name: http
+          containerPort: 80          
+          protocol: TCP
+        - name: gateway
+          containerPort: 30000          
+          protocol: TCP
+        - name: silo
+          containerPort: 11111          
+          protocol: TCP
+        - name: dashboard
+          containerPort: 8080          
+          protocol: TCP
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: template-service
+spec:
+  selector:
+    app: template-pod
+  type: LoadBalancer
+  ports:
+  - name: dashboard 
+    port: 8080
+    targetPort: 8080
+  - name: http
+    port: 80
+    targetPort: 80
