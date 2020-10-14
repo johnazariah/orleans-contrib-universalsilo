@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: template-pod
-  template:
+  t~emplate:
     metadata:
       labels:
         app: template-pod
