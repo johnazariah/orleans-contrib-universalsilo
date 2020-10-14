@@ -105,7 +105,6 @@ type ClientConfiguration() = class
     default __.ConfigureAppConfiguration _ configBuilder =
         configBuilder
             .SetBasePath(Directory.GetCurrentDirectory ())
-            .AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly())
         |> ignore
 
     abstract ConfigureServicesCore : HostBuilderContext -> IServiceCollection -> unit
