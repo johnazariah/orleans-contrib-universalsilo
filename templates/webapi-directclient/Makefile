@@ -3,24 +3,25 @@
 # We'll use some Unix commands here: install git bash with all Unix commands on the PATH
 # We'll need `make`: run `choco install make`
 
+-include Setup.cfg
 
 # project name
-project:=Template
+project   ?=Cheerio
 project-lc:=$(shell echo $(project) | tr A-Z a-z)
 
 # project configuration
-config:=Debug
+config    ?=Debug
 
 #
 #
 
 # container name
-acr=local
-git_branch = $(subst /,--,$(shell git rev-parse --abbrev-ref HEAD))
-git_latest_hash = $(shell git log -1 --pretty=format:"%h")
-image_tag = $(git_branch).$(git_latest_hash)
+acr             ?=local
+git_branch      ?=$(subst /,--,$(shell git rev-parse --abbrev-ref HEAD))
+git_latest_hash ?=$(shell git log -1 --pretty=format:"%h")
+image_tag       ?=$(git_branch).$(git_latest_hash)
 
-container_name:= $(acr)/$(project-lc):$(image_tag)
+container_name  ?=$(acr)/$(project-lc):$(image_tag)
 
 # k8s namespace
 k8s_namespace=green
@@ -141,3 +142,53 @@ k8s-deploy-dashboard :
 k8s-setup-rbac :
 	kubectl apply -f local-k8s-rbac.yml
 	kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}')
+
+# Az CLI
+az-start:
+	MSYS_NO_PATHCONV=1 docker run --rm --volume $(shell pwd):/code --workdir /code --interactive --tty mcr.microsoft.com/azure-cli
+
+# These commands are to be accessed from within the docker image started above
+az-login:
+	az login
+	@echo Ensure you set your default subscription in 'Setup.cfg'
+
+az-sub-set:
+	az account set --subscription $(sub)
+
+az-sub-show:
+	az account show
+
+az-show-regions:
+	az account list-locations --query "sort_by([].{Location:name}, &Location)" -o table
+
+get-random-number:
+	@echo $$RANDOM
+
+oaks-list-vars:
+	@echo
+	@echo Modify these values by editing 'Setup.cfg' and ensure that 'Makefile' has not overriden values unnecessarily.
+	@echo
+	@echo "sub                 : "[$(sub)]
+	@echo "region              : "[$(region)]
+	@echo "oaks_name           : "[$(oaks_name)]
+	@echo "oaks_resource_group : "[$(oaks_resource_group)]
+	@echo "oaks_keyvault       : "[$(oaks_keyvault)]
+	@echo "oaks_acr            : "[$(oaks_acr)]
+	@echo "oaks_acr_login      : "[$(oaks_acr_login)]
+	@echo "acr                 : "[$(acr)]
+	@echo "container_name      : "[$(container_name)]
+
+oaks-setup: oaks-setup-rg oaks-setup-kv oaks-setup-acr
+	@echo Completed setting up Orleans-on-AKS core resources
+
+oaks-setup-rg :
+	@echo Starting to set up OAKS resource group [$(oaks_resource_group)]
+	- az group create --name $(oaks_resource_group) --location $(region)
+
+oaks-setup-kv :
+	@echo Starting to set up OAKS key vault [$(oaks_keyvault)]
+	- az keyvault create --name $(oaks_keyvault) --resource-group $(oaks_resource_group) --location $(region)
+
+oaks-setup-acr :
+	@echo Starting to set up OAKS ACR [$(oaks_acr)]
+	- az acr create --resource-group $(oaks_resource_group) --name $(oaks_acr) --sku Basic
