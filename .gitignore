@@ -229,8 +229,9 @@ deploy/
 out.csv
 
 # Orleans UniversalSilo stuff
-local-k8s-deployment.yml
+.aks_kube_config
+k8s-deployment.yml
 persistence.json
 clustering.json
 scratch/
-.oaks/
+Setup.cfg

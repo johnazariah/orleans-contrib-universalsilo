@@ -5,8 +5,8 @@
 docker-compose.yml
 clustering.json
 persistence.json
-local-k8s-deployment.yml
-local-k8s-deployment.ymlt
+k8s-deployment.yml
+k8s-deployment.ymlt
 local-k8s-rbac.yml
 tye.yaml
 Makefile
