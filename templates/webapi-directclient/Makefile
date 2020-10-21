@@ -132,7 +132,7 @@ k8s-dashboard : k8s-deploy-dashboard k8s-setup-rbac
 	kubectl proxy
 
 k8s-create-namespace :
-	kubectl create namespace $(k8s_namespace)
+	- kubectl create namespace $(k8s_namespace)
 	kubectl config set-context --current --namespace $(k8s_namespace)
 
 k8s-replace-image-tag :
@@ -145,7 +145,7 @@ k8s-replace-image-tag :
 k8s-deploy-dashboard :
 	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
 
-k8s-setup-rbac-local :
+k8s-setup-rbac :
 	kubectl apply -f local-k8s-rbac.yml
 	kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}')
 
@@ -153,28 +153,29 @@ k8s-setup-rbac-local :
 get-random-number:
 	@echo $$RANDOM
 
-aks-list-vars:
+list-config:
 	@echo
 	@echo Modify these values by editing 'Setup.cfg' and ensure that 'Makefile' has not overriden values unnecessarily.
 	@echo
-	@echo "sub                 : "[$(sub)]
-	@echo "region              : "[$(region)]
-	@echo "org                 : "[$(org)]
-	@echo "acr                 : "[$(acr)]
-	@echo "container_name      : "[$(container_name)]
+	@echo "sub                            : "[$(sub)]
+	@echo "region                         : "[$(region)]
+	@echo "org                            : "[$(org)]
+	@echo "acr                            : "[$(acr)]
+	@echo "container_name                 : "[$(container_name)]
 	@echo
-	@echo "oaks_name           : "[$(oaks_name)]
-	@echo "oaks_resource_group : "[$(oaks_resource_group)]
-	@echo "oaks_keyvault       : "[$(oaks_keyvault)]
-	@echo "oaks_lawks          : "[$(oaks_lawks)]
-	@echo "oaks_acr            : "[$(oaks_acr)]
-	@echo "oaks_acr_login      : "[$(oaks_acr_login_server)]
+	@echo "oaks_name                      : "[$(oaks_name)]
+	@echo "oaks_resource_group            : "[$(oaks_resource_group)]
+	@echo "oaks_keyvault                  : "[$(oaks_keyvault)]
+	@echo "oaks_lawks                     : "[$(oaks_lawks)]
+	@echo "oaks_acr                       : "[$(oaks_acr)]
+	@echo "oaks_acr_login                 : "[$(oaks_acr_login_server)]
 	@echo
-	@echo "paks_resource_group : "[$(paks_resource_group)]
-	@echo "paks_keyvault       : "[$(paks_keyvault)]
-	@echo "paks_storage        : "[$(paks_storage)]
-	@echo "paks_storage_secret : "[$(paks_storage_secret)]
-	@echo "paks_cluster        : "[$(paks_cluster)]
+	@echo "paks_resource_group            : "[$(paks_resource_group)]
+	@echo "paks_keyvault                  : "[$(paks_keyvault)]
+	@echo "paks_storage                   : "[$(paks_storage)]
+	@echo "paks_storage_connection_string : "[$(paks_storage_connection_string)]
+	@echo "paks_storage_secret            : "[$(paks_storage_secret)]
+	@echo "paks_cluster                   : "[$(paks_cluster)]
 	@echo
 
 # Az CLI - when you have not installed AZ CLI locally, and do not want to, you can run it from inside a docker container
@@ -194,6 +195,15 @@ az-sub-show:
 
 az-show-regions:
 	az account list-locations --query "sort_by([].{Location:name}, &Location)" -o table
+
+az-new-all : az-new-org az-new-proj
+	@echo
+
+az-new-org : oaks-setup
+	@echo Completed setting up new organization [$(org)]]
+
+az-new-proj :  paks-setup paks-prepare-aks
+	@echo Completed setting up new project [$(project)] in organization [$(org)]
 
 oaks-cleanup:
 	- az group delete --name $(oaks_resource_group) --yes
@@ -216,12 +226,12 @@ oaks-setup-rg :
 	@echo
 
 oaks-setup-kv :
-	@echo Starting to set up OAKS key vault [$(oaks_keyvault)]
-	- az keyvault create\
-		--name $(oaks_keyvault)\
-		--resource-group $(oaks_resource_group)\
-		--location $(region)\
-		--enabled-for-template-deployment
+	# @echo Starting to set up OAKS key vault [$(oaks_keyvault)]
+	# - az keyvault create\
+	# 	--name $(oaks_keyvault)\
+	# 	--resource-group $(oaks_resource_group)\
+	# 	--location $(region)\
+	# 	--enabled-for-template-deployment
 	@echo
 
 oaks-setup-acr :
@@ -251,7 +261,7 @@ paks-cleanup:
 	- az group delete --name $(paks_resource_group) --yes
 	@echo Completed cleaning up project resources
 
-paks-setup : paks-setup-rg paks-setup-kv paks-setup-stg paks-setup-aks paks-register-provider
+paks-setup : paks-setup-rg paks-setup-kv paks-setup-stg paks-setup-aks
 	@echo Completed setting up project resources
 
 paks-setup-rg :
@@ -262,15 +272,18 @@ paks-setup-rg :
 	@echo
 
 paks-setup-kv :
-	@echo Starting to set up project key vault [$(paks_keyvault)]
-	- az keyvault create\
-		--name $(paks_keyvault)\
-		--resource-group $(paks_resource_group)\
-		--location $(region)\
-		--enabled-for-template-deployment
+	# @echo Starting to set up project key vault [$(paks_keyvault)]
+	# - az keyvault create\
+	# 	--name $(paks_keyvault)\
+	# 	--resource-group $(paks_resource_group)\
+	# 	--location $(region)\
+	# 	--enabled-for-template-deployment
 	@echo
 
-paks-setup-stg :
+paks-setup-stg : paks-create-storage paks-get-storage-connection-string
+	@echo
+
+paks-create-storage :
 	@echo Starting to set up project storage account [$(paks_storage)]
 	- az storage account create\
 		--name $(paks_storage)\
@@ -278,7 +291,10 @@ paks-setup-stg :
 		--kind StorageV2
 	@echo
 
-paks-setup-aks : workspace-resource-id=/subscriptions/$(sub)/resourcegroups/$(oaks_resource_group)/providers/microsoft.operationalinsights/workspaces/$(oaks_lawks)
+paks-get-storage-connection-string :
+	@echo #Modify your Setup.cfg and put this as the value of 'paks_storage_connection_string'
+	az storage account show-connection-string --name $(paks_storage) --resource-group $(paks_resource_group) --query connectionString -o tsv
+
 paks-setup-aks :
 	@echo Starting to set up project AKS cluster [$(paks_cluster)]
 	- az aks create\
@@ -287,14 +303,14 @@ paks-setup-aks :
 		--location $(region)\
 		--node-vm-size Standard_DS2_v2\
 		--node-count 2\
-		--workspace-resource-id $(workspace-resource-id)\
+		--workspace-resource-id /subscriptions/$(sub)/resourcegroups/$(oaks_resource_group)/providers/microsoft.operationalinsights/workspaces/$(oaks_lawks)\
 		--attach-acr $(oaks_acr)\
 		--enable-addons monitoring\
 		--enable-managed-identity\
 		--generate-ssh-keys
 	@echo
 
-aks-connect : paks-register-provider paks-install-cli paks-get-credentials paks-export-config
+paks-prepare-aks : paks-register-provider paks-install-cli paks-get-credentials paks-export-config
 
 paks-register-provider :
 	@echo Registering OperationsManagement and OperationalInsights
@@ -318,3 +334,12 @@ aks-switch-context :
 
 aks-acr-login : aks-switch-context
 	- docker login $(oaks_acr_login_server) -u 00000000-0000-0000-0000-000000000000 -p $(oaks_acr_login_token)
+
+aks-set-secrets : k8s-create-namespace aks-set-storage-secret
+	@echo Completed setting up secrets
+
+aks-set-storage-secret :
+	@echo Starting to set up storage connection string as a secrets
+	kubectl create secret generic $(paks_storage_secret)\
+		--namespace $(k8s_namespace)\
+		--from-literal=connection-string=$(paks_storage_connection_string)

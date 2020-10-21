@@ -28,7 +28,7 @@ spec:
                 secretKeyRef:
                   name: {storage-secret-name}
                   key: connection-string
-            - name: ENV_PERSISTENCE_AZURE_TABLE
+            - name: ENV_PERSISTENCE_AZURE_STORAGE
               valueFrom:
                 secretKeyRef:
                   name: {storage-secret-name}
