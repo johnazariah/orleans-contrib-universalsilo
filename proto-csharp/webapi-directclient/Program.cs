@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 using Orleans.Contrib.UniversalSilo.Configuration;
 using System;
 
-namespace Template.WebApiDirectClient
+namespace GeneratedProjectName.WebApiDirectClient
 {
     /// <summary>
     /// Override methods in this class to take over how the web-api host is configured
@@ -42,7 +42,7 @@ namespace Template.WebApiDirectClient
     {
         public override SiloConfiguration SiloConfiguration =>
             base.SiloConfiguration
-            .With(_c => _c.ServiceId = "Template");
+            .With(_c => _c.ServiceId = "GeneratedProjectName");
 
         public SiloConfigurator() : base()
         { }

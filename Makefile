@@ -133,23 +133,23 @@ copy-template.% :
 
 copy-single-template.standalone-silo copy-single-template.standalone-client : copy-single-template.% : copy-common.% copy-project.%
 	@echo Built Template Folder For $* [$(lang)]
-	- rm $(copy_target_root)/$*-$(lang)/Template/$*.$(projsuffix)
+	- rm $(copy_target_root)/$*-$(lang)/GeneratedProjectName/$*.$(projsuffix)
 	@echo
 
 copy-single-template.webapi-directclient : copy-single-template.% : copy-common.% copy-grain-controllers.% copy-project.%
 	@echo Built Template Folder For $* [$(lang)]
-	- rm $(copy_target_root)/$*-$(lang)/Template/$*.$(projsuffix)
+	- rm $(copy_target_root)/$*-$(lang)/GeneratedProjectName/$*.$(projsuffix)
 	@echo
 
 copy-single-template.silo-and-client : copy-single-template.% : copy-common.%
-	$(MAKE) source=$(proto_root)-$(lang)/standalone-silo   target=$(copy_target_root)/$*-$(lang)/Template.Silo copy
-	$(MAKE) source=$(proto_root)-$(lang)/standalone-client target=$(copy_target_root)/$*-$(lang)/Template.Client copy
-	$(MAKE) src_project_file=standalone-silo/standalone-silo.$(projsuffix)     dest_project_file=$*-$(lang)/Template.Silo/Template.Silo.$(projsuffix)     replace-project-reference-with-nuget-reference
-	$(MAKE) src_project_file=standalone-client/standalone-client.$(projsuffix) dest_project_file=$*-$(lang)/Template.Client/Template.Client.$(projsuffix) replace-project-reference-with-nuget-reference
-	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Silo.Makefile      template=$* replace-pattern
-	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Client.Makefile    template=$* replace-pattern
-	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Silo.Dockerfile    template=$* replace-pattern
-	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.Client.Dockerfile  template=$* replace-pattern
+	$(MAKE) source=$(proto_root)-$(lang)/standalone-silo   target=$(copy_target_root)/$*-$(lang)/GeneratedProjectName.Silo copy
+	$(MAKE) source=$(proto_root)-$(lang)/standalone-client target=$(copy_target_root)/$*-$(lang)/GeneratedProjectName.Client copy
+	$(MAKE) src_project_file=standalone-silo/standalone-silo.$(projsuffix)     dest_project_file=$*-$(lang)/GeneratedProjectName.Silo/GeneratedProjectName.Silo.$(projsuffix)     replace-project-reference-with-nuget-reference
+	$(MAKE) src_project_file=standalone-client/standalone-client.$(projsuffix) dest_project_file=$*-$(lang)/GeneratedProjectName.Client/GeneratedProjectName.Client.$(projsuffix) replace-project-reference-with-nuget-reference
+	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=GeneratedProjectName.Silo.Makefile      template=$* replace-pattern
+	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=GeneratedProjectName.Client.Makefile    template=$* replace-pattern
+	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=GeneratedProjectName.Silo.Dockerfile    template=$* replace-pattern
+	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=GeneratedProjectName.Client.Dockerfile  template=$* replace-pattern
 
 copy-common.% : copy-grains.% copy-grain-tests.% copy-templates.% copy-ignores.%
 	@echo Copied Common Components For $* [$(lang)]
@@ -172,7 +172,7 @@ copy-templates.% :
 	@echo
 	@echo Fixing up Language Specific Suffixes
 	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Makefile     template=$* replace-pattern
-	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Template.sln template=$* replace-pattern
+	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=GeneratedProjectName.sln template=$* replace-pattern
 	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=Dockerfile   template=$* replace-pattern
 	$(MAKE) replace_pattern=_PROJ_SUFFIX_ replacement_pattern=$(projsuffix) replace_in_file=tye.yaml     template=$* replace-pattern
 
@@ -187,8 +187,8 @@ copy-grain-controllers.% :
 
 copy-project.% :
 	@echo Copying Project For $* [$(lang)]
-	$(MAKE) source=$(proto_root)-$(lang)/$* target=$(copy_target_root)/$*-$(lang)/Template copy
-	$(MAKE) src_project_file=$*/$*.$(projsuffix) dest_project_file=$*-$(lang)/Template/Template.$(projsuffix) replace-project-reference-with-nuget-reference
+	$(MAKE) source=$(proto_root)-$(lang)/$* target=$(copy_target_root)/$*-$(lang)/GeneratedProjectName copy
+	$(MAKE) src_project_file=$*/$*.$(projsuffix) dest_project_file=$*-$(lang)/GeneratedProjectName/GeneratedProjectName.$(projsuffix) replace-project-reference-with-nuget-reference
 	@echo
 
 copy-ignores.% :

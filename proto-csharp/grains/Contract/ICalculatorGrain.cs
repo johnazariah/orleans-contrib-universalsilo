@@ -1,7 +1,7 @@
 ﻿using Orleans;
 using System.Threading.Tasks;
 
-namespace Template.Contract
+namespace GeneratedProjectName.Contract
 {
     public interface ICalculatorGrain : IGrainWithGuidKey
     {

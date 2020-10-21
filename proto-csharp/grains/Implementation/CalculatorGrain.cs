@@ -1,8 +1,8 @@
 ﻿using Orleans;
 using System.Threading.Tasks;
-using Template.Contract;
+using GeneratedProjectName.Contract;
 
-namespace Template.Implementation
+namespace GeneratedProjectName.Implementation
 {
     public class CalculatorGrain : Grain, ICalculatorGrain
     {

@@ -1,11 +1,11 @@
-namespace Test.Template
+namespace Test.GeneratedProjectName
 
 open FsCheck.Xunit
 open Orleans.Contrib.UniversalSilo
 open Orleans.TestingHost
 open System
 open System.Threading.Tasks
-open Template.Contract
+open GeneratedProjectName.Contract
 open Xunit
 
 /// <summary>

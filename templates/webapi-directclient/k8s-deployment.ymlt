@@ -1,19 +1,19 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: template-deployment
+  name: GeneratedProjectName-deployment
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: template-pod
-  t~emplate:
+      app: GeneratedProjectName-pod
+  template:
     metadata:
       labels:
-        app: template-pod
+        app: GeneratedProjectName-pod
     spec:
       containers:
-      - name: template-container
+      - name: GeneratedProjectName-container
         image: {image-name}
         resources:
           limits:
@@ -22,27 +22,17 @@ spec:
           requests:
             memory: "128Mi"
             cpu: "500m"
-        # env:
-        #   - name: ENV_CLUSTER_AZURE_STORAGE
-        #     valueFrom:
-        #       secretKeyRef:
-        #         name: {storage-secret-name}
-        #         key: connection-string
-        #   - name: ENV_PERSISTENCE_AZURE_TABLE
-        #     valueFrom:
-        #       secretKeyRef:
-        #         name: {storage-secret-name}
-        #         key: connection-string
-        #   - name: ENV_DATA_STORAGE_CONNECTION_STRING
-        #     valueFrom:
-        #       secretKeyRef:
-        #         name: {storage-secret-name}
-        #         key: connection-string
-        #   - name: ENV_DATA_STORAGE_COLLECTION_NAME
-        #     valueFrom:
-        #       secretKeyRef:
-        #         name: {storage-secret-name}
-        #         key: collection-name
+          env:
+            - name: ENV_CLUSTER_AZURE_STORAGE
+              valueFrom:
+                secretKeyRef:
+                  name: {storage-secret-name}
+                  key: connection-string
+            - name: ENV_PERSISTENCE_AZURE_TABLE
+              valueFrom:
+                secretKeyRef:
+                  name: {storage-secret-name}
+                  key: connection-string
         ports:
         - name: http
           containerPort: 80          
@@ -60,10 +50,10 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: template-service
+  name: GeneratedProjectName-service
 spec:
   selector:
-    app: template-pod
+    app: GeneratedProjectName-pod
   type: LoadBalancer
   ports:
   - name: dashboard 

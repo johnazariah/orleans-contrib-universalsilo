@@ -1,4 +1,4 @@
-﻿namespace Template.WebApiDirectClient
+﻿namespace GeneratedProjectName.WebApiDirectClient
 
 open Microsoft.Extensions.Hosting
 open Microsoft.OpenApi.Models
@@ -38,7 +38,7 @@ type SiloConfigurator () = class
     inherit Orleans.Contrib.UniversalSilo.SiloConfigurator()
 
     override __.SiloConfiguration =
-        base.SiloConfiguration.ServiceId <- "Template"
+        base.SiloConfiguration.ServiceId <- "GeneratedProjectName"
         base.SiloConfiguration
 end
 

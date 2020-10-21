@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Orleans.Contrib.UniversalSilo.Configuration;
 
-namespace Template.StandaloneSilo
+namespace GeneratedProjectName.StandaloneSilo
 {
     /// <summary>
     /// Override methods in this class to take over how the silo is configured
@@ -10,7 +10,7 @@ namespace Template.StandaloneSilo
     {
         public override SiloConfiguration SiloConfiguration =>
             base.SiloConfiguration
-            .With(_c => _c.ServiceId = "Template");
+            .With(_c => _c.ServiceId = "GeneratedProjectName");
 
         public SiloConfigurator() : base()
         { }

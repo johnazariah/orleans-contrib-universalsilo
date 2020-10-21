@@ -1,5 +1,5 @@
-name: Template
+name: GeneratedProjectName
 
 services:
   - name: client
-    project: Template/Template._PROJ_SUFFIX_
+    project: GeneratedProjectName/GeneratedProjectName._PROJ_SUFFIX_

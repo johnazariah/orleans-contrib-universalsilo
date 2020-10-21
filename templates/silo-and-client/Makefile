@@ -4,10 +4,10 @@
 # We'll need `make`: run `choco install make`
 
 # project name
-project:=Template
+project:=GeneratedProjectName
 project-lc:=$(shell echo $(project) | tr A-Z a-z)
-silo=Template.Silo
-client=Template.Client
+silo=GeneratedProjectName.Silo
+client=GeneratedProjectName.Client
 
 # project configuration
 config=Debug

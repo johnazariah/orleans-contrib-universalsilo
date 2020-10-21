@@ -1,4 +1,4 @@
-﻿namespace Template.Contract
+﻿namespace GeneratedProjectName.Contract
 
 open Orleans
 open System.Threading.Tasks

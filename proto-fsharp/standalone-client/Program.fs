@@ -1,9 +1,9 @@
-﻿namespace Template.StandaloneClient
+﻿namespace GeneratedProjectName.StandaloneClient
 open Microsoft.Extensions.Hosting
 open Orleans.Contrib.UniversalSilo.ClusterClient
 open System
 open System.Threading.Tasks
-open Template.Contract
+open GeneratedProjectName.Contract
 
 
 /// This is the service that will host your client application.
@@ -24,7 +24,7 @@ type ClientConfiguration() = class
     inherit ClientConfiguration<ClientService>()
 
     override __.SiloConfiguration =
-        base.SiloConfiguration.ServiceId <- "Template"
+        base.SiloConfiguration.ServiceId <- "GeneratedProjectName"
         base.SiloConfiguration
 end
 

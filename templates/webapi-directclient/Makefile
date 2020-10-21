@@ -6,7 +6,7 @@
 -include Setup.cfg
 
 # project name
-project   ?=Cheerio
+project   ?=GeneratedProjectName
 project-lc:=$(shell echo $(project) | tr A-Z a-z)
 
 # project configuration
@@ -33,7 +33,7 @@ init : git-init
 git-init :
 	git init
 	git add .
-	git commit -m "Initial commit of Template"
+	git commit -m "Initial commit of GeneratedProjectName"
 
 # .NET commands
 dotnet-publish :
@@ -136,7 +136,7 @@ k8s-create-namespace :
 	kubectl config set-context --current --namespace $(k8s_namespace)
 
 k8s-replace-image-tag :
-	sed -e "s|{image-name}|$(container_name)|g;s|t~em|tem|g" k8s-deployment.ymlt > k8s-deployment.yml
+	sed -e "s|{image-name}|$(container_name)|g" k8s-deployment.ymlt > k8s-deployment.yml
 
 k8s-deploy-dashboard :
 	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml

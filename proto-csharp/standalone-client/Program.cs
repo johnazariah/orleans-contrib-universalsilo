@@ -4,9 +4,9 @@ using Orleans.Contrib.UniversalSilo.ClusterClient;
 using Orleans.Contrib.UniversalSilo.Configuration;
 using System;
 using System.Threading.Tasks;
-using Template.Contract;
+using GeneratedProjectName.Contract;
 
-namespace Template.StandaloneClient
+namespace GeneratedProjectName.StandaloneClient
 {
     /// <summary>
     /// This is the service that will host your client application.
@@ -47,7 +47,7 @@ namespace Template.StandaloneClient
     {
         public override SiloConfiguration SiloConfiguration =>
             base.SiloConfiguration
-            .With(_c => _c.ServiceId = "Template");
+            .With(_c => _c.ServiceId = "GeneratedProjectName");
     }
 
     /// <summary>

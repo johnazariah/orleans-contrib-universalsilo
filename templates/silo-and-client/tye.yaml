@@ -1,12 +1,12 @@
-name: Template
+name: GeneratedProjectName
 
 services:
   - name: silo
     replicas: 3
-    project: Template.Silo/Template.Silo._PROJ_SUFFIX_
+    project: GeneratedProjectName.Silo/GeneratedProjectName.Silo._PROJ_SUFFIX_
     bindings:
     - containerPort: 11111
     - containerPort: 30000
     - port: 8080
   - name: client
-    project: Template.Client/Template.Client._PROJ_SUFFIX_
+    project: GeneratedProjectName.Client/GeneratedProjectName.Client._PROJ_SUFFIX_
