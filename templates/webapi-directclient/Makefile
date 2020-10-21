@@ -136,7 +136,11 @@ k8s-create-namespace :
 	kubectl config set-context --current --namespace $(k8s_namespace)
 
 k8s-replace-image-tag :
-	sed -e "s|{image-name}|$(container_name)|g" k8s-deployment.ymlt > k8s-deployment.yml
+	sed -e \
+		"s|{image-name}|$(container_name)|g;\
+		 s|{project-name}|$(project-lc)|g;\
+		 s|{storage-secret-name}|$(paks_storage_secret)|g"\
+		k8s-deployment.ymlt > k8s-deployment.yml
 
 k8s-deploy-dashboard :
 	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
@@ -148,7 +152,7 @@ k8s-setup-rbac-local :
 # Utilities
 get-random-number:
 	@echo $$RANDOM
-	
+
 aks-list-vars:
 	@echo
 	@echo Modify these values by editing 'Setup.cfg' and ensure that 'Makefile' has not overriden values unnecessarily.
@@ -169,6 +173,7 @@ aks-list-vars:
 	@echo "paks_resource_group : "[$(paks_resource_group)]
 	@echo "paks_keyvault       : "[$(paks_keyvault)]
 	@echo "paks_storage        : "[$(paks_storage)]
+	@echo "paks_storage_secret : "[$(paks_storage_secret)]
 	@echo "paks_cluster        : "[$(paks_cluster)]
 	@echo
 
@@ -220,7 +225,7 @@ oaks-setup-kv :
 	@echo
 
 oaks-setup-acr :
-	@echo Starting to set up OAKS ACR [$(oaks_acr)]	
+	@echo Starting to set up OAKS ACR [$(oaks_acr)]
 	- az acr create\
 		--name $(oaks_acr)\
 		--resource-group $(oaks_resource_group)\
@@ -228,7 +233,7 @@ oaks-setup-acr :
 	@echo
 
 oaks-login-acr :
-	@echo Logging in to OAKS ACR [$(oaks_acr)]	
+	@echo Logging in to OAKS ACR [$(oaks_acr)]
 	- az acr login\
 		--name $(oaks_acr)\
 		--expose-token\
@@ -266,7 +271,7 @@ paks-setup-kv :
 	@echo
 
 paks-setup-stg :
-	@echo Starting to set up project storage account [$(paks_storage)]	
+	@echo Starting to set up project storage account [$(paks_storage)]
 	- az storage account create\
 		--name $(paks_storage)\
 		--resource-group $(paks_resource_group)\
@@ -275,7 +280,7 @@ paks-setup-stg :
 
 paks-setup-aks : workspace-resource-id=/subscriptions/$(sub)/resourcegroups/$(oaks_resource_group)/providers/microsoft.operationalinsights/workspaces/$(oaks_lawks)
 paks-setup-aks :
-	@echo Starting to set up project AKS cluster [$(paks_cluster)]	
+	@echo Starting to set up project AKS cluster [$(paks_cluster)]
 	- az aks create\
 		--name $(paks_cluster)\
 		--resource-group $(paks_resource_group)\

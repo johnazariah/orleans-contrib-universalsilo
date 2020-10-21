@@ -1,19 +1,19 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: GeneratedProjectName-deployment
+  name: {project-name}-deployment
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: GeneratedProjectName-pod
+      app: {project-name}-pod
   template:
     metadata:
       labels:
-        app: GeneratedProjectName-pod
+        app: {project-name}-pod
     spec:
       containers:
-      - name: GeneratedProjectName-container
+      - name: {project-name}-container
         image: {image-name}
         resources:
           limits:
@@ -35,28 +35,28 @@ spec:
                   key: connection-string
         ports:
         - name: http
-          containerPort: 80          
+          containerPort: 80
           protocol: TCP
         - name: gateway
-          containerPort: 30000          
+          containerPort: 30000
           protocol: TCP
         - name: silo
-          containerPort: 11111          
+          containerPort: 11111
           protocol: TCP
         - name: dashboard
-          containerPort: 8080          
+          containerPort: 8080
           protocol: TCP
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: GeneratedProjectName-service
+  name: {project-name}-service
 spec:
   selector:
-    app: GeneratedProjectName-pod
+    app: {project-name}-pod
   type: LoadBalancer
   ports:
-  - name: dashboard 
+  - name: dashboard
     port: 8080
     targetPort: 8080
   - name: http
