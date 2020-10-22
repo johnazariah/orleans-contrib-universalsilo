@@ -6,22 +6,21 @@
 -include Setup.cfg
 
 # project name
-project   ?=GeneratedProjectName
-project-lc:=$(shell echo $(project) | tr A-Z a-z)
+project    ?=GeneratedProjectName
+project-lc :=$(shell echo $(project) | tr A-Z a-z)
 
 # project configuration
-config    ?=Debug
+config ?=Debug
 
 #
 #
 
 # container name
-acr             ?=local
-git_branch      ?=$(subst /,--,$(shell git rev-parse --abbrev-ref HEAD))
-git_latest_hash ?=$(shell git log -1 --pretty=format:"%h")
-image_tag       ?=$(git_branch).$(git_latest_hash)
-
-container_name  ?=$(acr)/$(project-lc):$(image_tag)
+oaks_acr_login_server ?=local
+git_branch            ?=$(subst /,--,$(shell git rev-parse --abbrev-ref HEAD))
+git_latest_hash       ?=$(shell git log -1 --pretty=format:"%h")
+image_tag             ?=$(git_branch).$(git_latest_hash)
+container_name        ?=$(oaks_acr_login_server)/$(project-lc):$(image_tag)
 
 # k8s namespace
 k8s_namespace=green
@@ -160,7 +159,6 @@ list-config:
 	@echo "sub                            : "[$(sub)]
 	@echo "region                         : "[$(region)]
 	@echo "org                            : "[$(org)]
-	@echo "acr                            : "[$(acr)]
 	@echo "container_name                 : "[$(container_name)]
 	@echo
 	@echo "oaks_name                      : "[$(oaks_name)]
@@ -168,7 +166,7 @@ list-config:
 	@echo "oaks_keyvault                  : "[$(oaks_keyvault)]
 	@echo "oaks_lawks                     : "[$(oaks_lawks)]
 	@echo "oaks_acr                       : "[$(oaks_acr)]
-	@echo "oaks_acr_login                 : "[$(oaks_acr_login_server)]
+	@echo "oaks_acr_login_server          : "[$(oaks_acr_login_server)]
 	@echo
 	@echo "paks_resource_group            : "[$(paks_resource_group)]
 	@echo "paks_keyvault                  : "[$(paks_keyvault)]
