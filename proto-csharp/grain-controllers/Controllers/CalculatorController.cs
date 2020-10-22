@@ -4,9 +4,9 @@ using Microsoft.Extensions.Logging;
 using Orleans;
 using System;
 using System.Threading.Tasks;
-using Template.Contract;
+using GeneratedProjectName.Contract;
 
-namespace Template.Controllers
+namespace GeneratedProjectName.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

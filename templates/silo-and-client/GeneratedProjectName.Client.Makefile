@@ -4,7 +4,7 @@
 # We'll need `make`: run `choco install make`
 
 # project name
-project:=Template.Client
+project:=GeneratedProjectName.Client
 project-lc:=$(shell echo $(project) | tr A-Z a-z)
 
 # project configuration
@@ -28,7 +28,7 @@ init : git-init
 git-init :
 	git init
 	git add .
-	git commit -m "Initial commit of Template"
+	git commit -m "Initial commit of GeneratedProjectName"
 
 # .NET commands
 dotnet-publish :

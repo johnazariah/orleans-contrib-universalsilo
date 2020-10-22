@@ -1,4 +1,4 @@
-﻿namespace Template.StandaloneSilo
+﻿namespace GeneratedProjectName.StandaloneSilo
 
 open Microsoft.Extensions.Hosting
 open Orleans.Contrib.UniversalSilo.Configuration.Extensions
@@ -8,7 +8,7 @@ type SiloConfigurator () = class
     inherit Orleans.Contrib.UniversalSilo.SiloConfigurator()
 
     override __.SiloConfiguration =
-        base.SiloConfiguration.ServiceId <- "Template"
+        base.SiloConfiguration.ServiceId <- "GeneratedProjectName"
         base.SiloConfiguration
 end
 

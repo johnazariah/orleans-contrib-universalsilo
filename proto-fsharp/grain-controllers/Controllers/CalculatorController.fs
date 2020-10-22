@@ -1,11 +1,11 @@
-﻿namespace Template.Controllers
+﻿namespace GeneratedProjectName.Controllers
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 open Orleans
 open System
 open System.Threading.Tasks
-open Template.Contract
+open GeneratedProjectName.Contract
 
 [<ApiController>]
 [<Route("api/[controller]")>]

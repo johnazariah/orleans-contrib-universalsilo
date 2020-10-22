@@ -3,10 +3,10 @@ using Orleans.Contrib.UniversalSilo;
 using Orleans.TestingHost;
 using System;
 using System.Threading.Tasks;
-using Template.Contract;
+using GeneratedProjectName.Contract;
 using Xunit;
 
-namespace Test.Template
+namespace Test.GeneratedProjectName
 {
     /// <summary>
     /// This is needed to group tests together into a fixture

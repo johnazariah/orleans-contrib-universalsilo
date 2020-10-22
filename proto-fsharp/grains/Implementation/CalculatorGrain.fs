@@ -1,8 +1,8 @@
-﻿namespace Template.Implementation
+﻿namespace GeneratedProjectName.Implementation
 
 open Orleans
 open System.Threading.Tasks
-open Template.Contract
+open GeneratedProjectName.Contract
 
 type public CalculatorGrain() = class
     inherit Grain()

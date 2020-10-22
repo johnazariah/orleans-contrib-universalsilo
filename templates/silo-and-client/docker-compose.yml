@@ -3,7 +3,7 @@ services:
   silo:
     build:
         context: .\
-        dockerfile: Template.Silo.Dockerfile
+        dockerfile: GeneratedProjectName.Silo.Dockerfile
     ports:
         - "11111:11111"
         - "30000:30000"
@@ -11,4 +11,4 @@ services:
   client:
     build:
         context: .\
-        dockerfile: Template.Client.Dockerfile
+        dockerfile: GeneratedProjectName.Client.Dockerfile

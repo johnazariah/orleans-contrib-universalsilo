@@ -2,10 +2,10 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 ARG config=Release
 COPY . "/src"
-RUN dotnet restore "/src/Template.Client/Template.Client._PROJ_SUFFIX_"
-RUN dotnet build --no-restore "/src/Template.Client/Template.Client._PROJ_SUFFIX_" -c ${config}
-RUN dotnet test --no-build "/src/Template.Client/Template.Client._PROJ_SUFFIX_" -c ${config}
-RUN dotnet publish --no-build  "/src/Template.Client/Template.Client._PROJ_SUFFIX_" -c ${config} -o /app
+RUN dotnet restore "/src/GeneratedProjectName.Client/GeneratedProjectName.Client._PROJ_SUFFIX_"
+RUN dotnet build --no-restore "/src/GeneratedProjectName.Client/GeneratedProjectName.Client._PROJ_SUFFIX_" -c ${config}
+RUN dotnet test --no-build "/src/GeneratedProjectName.Client/GeneratedProjectName.Client._PROJ_SUFFIX_" -c ${config}
+RUN dotnet publish --no-build  "/src/GeneratedProjectName.Client/GeneratedProjectName.Client._PROJ_SUFFIX_" -c ${config} -o /app
 
 # container to run the server from
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS release
@@ -21,4 +21,4 @@ ENV ENV_CLUSTERING_DEV_STORAGE  "DefaultEndpointsProtocol=http;AccountName=devst
 
 COPY --from=build /app .
 
-ENTRYPOINT ["dotnet", "Template.Client.dll"]
+ENTRYPOINT ["dotnet", "GeneratedProjectName.Client.dll"]

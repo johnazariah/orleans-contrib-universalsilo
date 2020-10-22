@@ -1,9 +1,9 @@
-name: Template
+name: GeneratedProjectName
 
 services:
   - name: silo
     replicas: 3
-    project: Template/Template._PROJ_SUFFIX_
+    project: GeneratedProjectName/GeneratedProjectName._PROJ_SUFFIX_
     bindings:
     - containerPort: 11111
     - containerPort: 30000
