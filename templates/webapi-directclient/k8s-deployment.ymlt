@@ -22,17 +22,17 @@ spec:
           requests:
             memory: "128Mi"
             cpu: "500m"
-          env:
-            - name: ENV_CLUSTER_AZURE_STORAGE
-              valueFrom:
-                secretKeyRef:
-                  name: {storage-secret-name}
-                  key: connection-string
-            - name: ENV_PERSISTENCE_AZURE_STORAGE
-              valueFrom:
-                secretKeyRef:
-                  name: {storage-secret-name}
-                  key: connection-string
+        env:
+          - name: ENV_CLUSTER_AZURE_STORAGE
+            valueFrom:
+              secretKeyRef:
+                name: {storage-secret-name}
+                key: connection-string
+          - name: ENV_PERSISTENCE_AZURE_STORAGE
+            valueFrom:
+              secretKeyRef:
+                name: {storage-secret-name}
+                key: connection-string
         ports:
         - name: http
           containerPort: 80
