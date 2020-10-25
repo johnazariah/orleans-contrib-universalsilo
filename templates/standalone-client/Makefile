@@ -73,7 +73,7 @@ docker-run-hostlocal :
 	powershell Start-Process powershell -ArgumentList \
 	'docker','run','--rm',\
 	'-e','ENV_CLUSTER_MODE=HostLocal',\
-	'-e','silo-address=$(silo_address)',\
+	'-e','ENV_SILO_ADDRESS=$(silo_address)',\
 	'$(container_name)'
 
 docker-image-explore :

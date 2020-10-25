@@ -47,7 +47,7 @@ The template "Orleans: WebAPI Direct Client" was created successfully.
 - [Simple Configuration](config-simple-configuration.md)
 
 ### Running Your Application
-- [Running from Visual Studio](running-visualstudio.md)
+- [Development and Deployment Workflows](running-workflows.md)
 - [Running from the command-line](running-commandline.md)
 - Running with Tye
 

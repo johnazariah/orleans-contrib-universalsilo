@@ -1,6 +1,10 @@
-# Running the application from the command line
+# Development/Deployment workflows
 
-## Using `make`
+## Multiple Workflows
+![Multiple Workflows](images/Workflows.png)
+
+
+
 The simplest way to build and run your application is using the provided `Makefile`. You can inspect all the targets that you can run with `make` by inpecting the `Makefile` in your directory.
 
 The `Makefile` has targets to help you build, test, package and run the application as a `dotnet` application as well as a `Docker` image.

@@ -13,22 +13,22 @@ open Microsoft.Extensions.Hosting
 [<AutoOpen>]
 module Keys =
 
-    let [<Literal>] ENV_SILO_ADDRESS                           = "silo-address"
+    let [<Literal>] ENV_SILO_ADDRESS          = "ENV_SILO_ADDRESS"
 
-    let [<Literal>] ENV_CLUSTER_ID                             = "ENV_CLUSTER_ID"
-    let [<Literal>] ENV_SERVICE_ID                             = "ENV_SERVICE_ID"
-    let [<Literal>] ENV_SILO_PORT                              = "ENV_SILO_PORT"
-    let [<Literal>] ENV_GATEWAY_PORT                           = "ENV_GATEWAY_PORT"
+    let [<Literal>] ENV_CLUSTER_ID            = "ENV_CLUSTER_ID"
+    let [<Literal>] ENV_SERVICE_ID            = "ENV_SERVICE_ID"
+    let [<Literal>] ENV_SILO_PORT             = "ENV_SILO_PORT"
+    let [<Literal>] ENV_GATEWAY_PORT          = "ENV_GATEWAY_PORT"
 
-    let [<Literal>] ENV_CLUSTER_MODE                           = "ENV_CLUSTER_MODE"
-    let [<Literal>] ENV_CLUSTER_AZURE_STORAGE                  = "ENV_CLUSTER_AZURE_STORAGE"
-    let [<Literal>] ENV_CLUSTERING_DEV_STORAGE                 = "ENV_CLUSTERING_DEV_STORAGE"
+    let [<Literal>] ENV_CLUSTER_MODE          = "ENV_CLUSTER_MODE"
+    let [<Literal>] ENV_CLUSTER_AZURE_STORAGE = "ENV_CLUSTER_AZURE_STORAGE"
+    let [<Literal>] ENV_CLUSTER_DEV_STORAGE   = "ENV_CLUSTER_DEV_STORAGE"
 
-    let [<Literal>] ENV_PERSISTENCE_MODE                       = "ENV_PERSISTENCE_MODE"
-    let [<Literal>] ENV_PERSISTENCE_AZURE_STORAGE              = "ENV_PERSISTENCE_AZURE_STORAGE"
-    let [<Literal>] ENV_PERSISTENCE_DEV_STORAGE                = "ENV_PERSISTENCE_DEV_STORAGE"
+    let [<Literal>] ENV_PERSIST_MODE          = "ENV_PERSIST_MODE"
+    let [<Literal>] ENV_PERSIST_AZURE_STORAGE = "ENV_PERSIST_AZURE_STORAGE"
+    let [<Literal>] ENV_PERSIST_DEV_STORAGE   = "ENV_PERSIST_DEV_STORAGE"
 
-    let [<Literal>] ENV_APPINSIGHTS_KEY                        = "APPINSIGHTS_INSTRUMENTATIONKEY"
+    let [<Literal>] ENV_APPINSIGHTS_KEY       = "APPINSIGHTS_INSTRUMENTATIONKEY"
 
 [<AutoOpen>]
 module Enumerations =
@@ -39,9 +39,9 @@ module Enumerations =
     | Kubernetes  = 3
 
     type PersistenceModes =
-    | InMemory             = 0
-    | AzureTable           = 1
-    | AzureBlob            = 2
+    | InMemory    = 0
+    | AzureTable  = 1
+    | AzureBlob   = 2
 
 module private StringOps =
     let [<Literal>] TruncatedLength = 16
@@ -134,25 +134,25 @@ module Extensions =
 module Configuration =
     type IConfiguration with
         // clustering settings
-        member private this.SiloAddress = this.["silo-address"]
+        member private this.SiloAddress = this.[ENV_SILO_ADDRESS]
         member private this.ClusteringMode  def =
             def
             |> this.[ENV_CLUSTER_MODE].EnumOrDefault
 
         member private this.AzureClusteringConnectionString def =
             def
-            |> this.[ENV_CLUSTERING_DEV_STORAGE].StringOrDefault
+            |> this.[ENV_CLUSTER_DEV_STORAGE].StringOrDefault
             |> this.[ENV_CLUSTER_AZURE_STORAGE].StringOrDefault
 
         // storage provider settings
         member private this.PersistenceMode def =
             def
-            |> this.[ENV_PERSISTENCE_MODE].EnumOrDefault
+            |> this.[ENV_PERSIST_MODE].EnumOrDefault
 
         member private this.AzureStorageConnectionString def =
             def
-            |> this.[ENV_PERSISTENCE_DEV_STORAGE].StringOrDefault
-            |> this.[ENV_PERSISTENCE_AZURE_STORAGE].StringOrDefault
+            |> this.[ENV_PERSIST_DEV_STORAGE].StringOrDefault
+            |> this.[ENV_PERSIST_AZURE_STORAGE].StringOrDefault
 
         // silo settings
         member private this.ClusterId       def = def |> this.[ENV_CLUSTER_ID].StringOrDefault
@@ -218,7 +218,7 @@ module Configuration =
             let siloAddress =
                 match IPAddress.TryParse config.SiloAddress with
                 | (true, result) ->
-                    logger.LogInformation("A silo address was specified in the $silo-address$ environment variable or command line argument. {SiloAddress}", result)
+                    logger.LogInformation("A silo address was specified in the $ENV_SILO_ADDRESS$ environment variable or command line argument. {SiloAddress}", result)
                     result
                 | _ ->
                     match localConfiguration.ClusteringMode with
