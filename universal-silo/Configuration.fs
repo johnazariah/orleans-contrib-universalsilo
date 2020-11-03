@@ -108,20 +108,20 @@ type UniversalSiloConfiguration = {
 [<Extension>]
 module Extensions =
     type IHostBuilder with
-        member this.ApplyAppConfiguration() =
+        member this.ConfigureHostConfigurationDefaults() =
             this.ConfigureHostConfiguration (fun cb ->
                 cb
                     .SetBasePath(Directory.GetCurrentDirectory())
                 |> ignore)
 
-        member this.ApplyConfiguration f =
+        member this.ApplyHostConfigurationFunc f =
             f this
 
-    let [<Extension>] inline ApplyConfiguration (_this : IHostBuilder) (_func : Func<IHostBuilder, IHostBuilder>) =
-        _this.ApplyConfiguration (fun hb -> _func.Invoke hb)
+    let [<Extension>] inline ApplyHostConfigurationFunc (_this : IHostBuilder) (_func : Func<IHostBuilder, IHostBuilder>) =
+        _this.ApplyHostConfigurationFunc (fun hb -> _func.Invoke hb)
 
-    let [<Extension>] inline ApplyAppConfiguration (_this : IHostBuilder) =
-        _this.ApplyAppConfiguration()
+    let [<Extension>] inline ConfigureHostConfigurationDefaults (_this : IHostBuilder) =
+        _this.ConfigureHostConfigurationDefaults()
 
     let [<Extension>] inline Apply (_this : 'a) (func : Func<'a, 'a>) : 'a =
         func.Invoke _this

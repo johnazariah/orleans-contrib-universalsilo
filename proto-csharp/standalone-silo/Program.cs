@@ -40,7 +40,7 @@ namespace GeneratedProjectName.StandaloneSilo
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host
             .CreateDefaultBuilder(args)
-            .ApplyAppConfiguration()
+            .ConfigureHostConfigurationDefaults()
             .UseOrleans(new SiloConfigurator().ConfigureSiloHost);
     }
 }

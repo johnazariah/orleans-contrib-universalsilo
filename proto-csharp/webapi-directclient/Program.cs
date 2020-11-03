@@ -72,8 +72,8 @@ namespace GeneratedProjectName.WebApiDirectClient
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host
             .CreateDefaultBuilder(args)
-            .ApplyAppConfiguration()
-            .ApplyConfiguration(new WebApiConfigurator().ConfigureWebApiHost)
+            .ConfigureHostConfigurationDefaults()
+            .ApplyHostConfigurationFunc(new WebApiConfigurator().ConfigureWebApiHost)
             .UseOrleans(new SiloConfigurator().ConfigureSiloHost);
     }
 }

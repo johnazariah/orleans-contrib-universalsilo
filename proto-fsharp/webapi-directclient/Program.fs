@@ -57,8 +57,8 @@ module Program =
     [<EntryPoint>]
     let Main args =
         (Host.CreateDefaultBuilder args)
-            .ApplyAppConfiguration()
-            .ApplyConfiguration((new WebApiConfigurator()).ConfigureWebApiHost)
+            .ConfigureHostConfigurationDefaults()
+            .ApplyHostConfigurationFunc((new WebApiConfigurator()).ConfigureWebApiHost)
             .UseOrleans((new SiloConfigurator()).ConfigureSiloHost)
             .Build()
             .Run()
