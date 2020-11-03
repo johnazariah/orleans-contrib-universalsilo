@@ -26,7 +26,7 @@ module Program =
     [<EntryPoint>]
     let Main args =
         (Host.CreateDefaultBuilder args)
-            .ApplyAppConfiguration()
+            .ConfigureHostConfigurationDefaults()
             .UseOrleans((new SiloConfigurator()).ConfigureSiloHost)
             .Build()
             .Run()
