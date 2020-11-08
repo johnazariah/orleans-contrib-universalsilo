@@ -9,7 +9,7 @@ namespace GeneratedProjectName.WebApiDirectClient
     /// <summary>
     /// Override methods in this class to take over how the web-api host is configured
     /// </summary>
-    class WebApiConfigurator : Orleans.Contrib.UniversalSilo.WebApiConfigurator
+    class WebApiConfigurator
     {
         private static readonly OpenApiInfo _apiInfo =
             new OpenApiInfo
@@ -72,8 +72,8 @@ namespace GeneratedProjectName.WebApiDirectClient
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host
             .CreateDefaultBuilder(args)
-            .ConfigureHostConfigurationDefaults()
-            .ApplyHostConfigurationFunc(new WebApiConfigurator().ConfigureWebApiHost)
-            .UseOrleans(new SiloConfigurator().ConfigureSiloHost);
+            .ConfigureHostConfigurationDefaults()            
+            .UseOrleans(new SiloConfigurator().ConfigurationFunc)
+            .ApplyHostConfigurationFunc(new WebApiConfigurator().ConfigurationFunc);
     }
 }

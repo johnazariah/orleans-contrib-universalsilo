@@ -58,8 +58,8 @@ module Program =
     let Main args =
         (Host.CreateDefaultBuilder args)
             .ConfigureHostConfigurationDefaults()
-            .ApplyHostConfigurationFunc((new WebApiConfigurator()).ConfigureWebApiHost)
-            .UseOrleans((new SiloConfigurator()).ConfigureSiloHost)
+            .UseOrleans((new SiloConfigurator()).ConfigurationFunc)
+            .ApplyHostConfigurationFunc((new WebApiConfigurator()).ConfigurationFunc)
             .Build()
             .Run()
         0

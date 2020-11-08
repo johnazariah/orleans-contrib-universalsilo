@@ -27,7 +27,7 @@ module Program =
     let Main args =
         (Host.CreateDefaultBuilder args)
             .ConfigureHostConfigurationDefaults()
-            .UseOrleans((new SiloConfigurator()).ConfigureSiloHost)
+            .UseOrleans((new SiloConfigurator()).ConfigurationFunc)
             .Build()
             .Run()
         0

@@ -41,6 +41,6 @@ namespace GeneratedProjectName.StandaloneSilo
             Host
             .CreateDefaultBuilder(args)
             .ConfigureHostConfigurationDefaults()
-            .UseOrleans(new SiloConfigurator().ConfigureSiloHost);
+            .UseOrleans(new SiloConfigurator().ConfigurationFunc);
     }
 }

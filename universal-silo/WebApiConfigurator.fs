@@ -112,8 +112,8 @@ type WebApiConfigurator (apiInfo : OpenApiInfo, useHttpsRedirection : bool) = cl
         |> (fun b -> b.Configure(fun ctx app -> this.Configure app ctx.HostingEnvironment))
         |> (fun b -> b.UseSetting(WebHostDefaults.ApplicationKey, Assembly.GetEntryAssembly().GetName().Name))
 
-    abstract ConfigureWebApiHost : IHostBuilder -> IHostBuilder
-    default this.ConfigureWebApiHost builder =
+    abstract ConfigurationFunc : IHostBuilder -> IHostBuilder
+    default this.ConfigurationFunc builder =
         builder
             .ConfigureWebHostDefaults(fun _b -> this.ConfigureWebHost _b |> ignore)
             .ConfigureServices(fun hostBuilderContext _        -> this.SetConfigurationObject hostBuilderContext          |> ignore)

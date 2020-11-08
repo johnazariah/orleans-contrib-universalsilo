@@ -138,8 +138,8 @@ type SiloConfigurator() = class
             |> (fun apm -> apm.WithCodeGeneration())
             |> ignore)
 
-    abstract ConfigureSiloHost : HostBuilderContext -> ISiloBuilder -> unit
-    default this.ConfigureSiloHost hostBuilderContext siloBuilder =
+    abstract ConfigurationFunc : HostBuilderContext -> ISiloBuilder -> unit
+    default this.ConfigurationFunc hostBuilderContext siloBuilder =
         let clusteringConfiguration =
             this.ClusteringConfiguration
             |> BuildClusteringConfiguration logger hostBuilderContext.Configuration
