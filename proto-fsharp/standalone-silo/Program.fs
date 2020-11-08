@@ -1,11 +1,12 @@
 ﻿namespace GeneratedProjectName.StandaloneSilo
 
+open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
-open Orleans.Contrib.UniversalSilo.Configuration.Extensions
+open System.IO
 
 /// Override methods in this class to take over how the silo is configured
 type SiloConfigurator () = class
-    inherit Orleans.Contrib.UniversalSilo.SiloConfigurator()
+    inherit Orleans.Contrib.UniversalSilo.Configuration.SiloConfigurator()
 
     override __.SiloConfiguration =
         base.SiloConfiguration.ServiceId <- "GeneratedProjectName"
@@ -25,9 +26,9 @@ module Program =
     ///    * Overriding methods in the `SiloConfigurator` class
     [<EntryPoint>]
     let Main args =
-        (Host.CreateDefaultBuilder args)
-            .ConfigureHostConfigurationDefaults()
-            .UseOrleans((new SiloConfigurator()).ConfigureSiloHost)
+        (Host.CreateDefaultBuilder args)            
+            .ConfigureHostConfiguration(fun builder -> ignore <| builder.SetBasePath(Directory.GetCurrentDirectory()))
+            .UseOrleans((new SiloConfigurator()).ConfigurationFunc)
             .Build()
             .Run()
         0

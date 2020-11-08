@@ -11,7 +11,10 @@ spec:
     metadata:
       labels:
         app: {project-name}-pod
+        orleans/serviceId: {project-name}
+        orleans/clusterId: {project-name}-green
     spec:
+      terminationGracePeriodSeconds: 180
       containers:
       - name: {project-name}-container
         image: {image-name}
@@ -23,6 +26,18 @@ spec:
             memory: "128Mi"
             cpu: "500m"
         env:
+          - name: ENV_SERVICE_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['orleans/serviceId']
+          - name: ENV_CLUSTER_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['orleans/clusterId']
+          - name: ENV_CLUSTER_MODE
+            value: "Azure"
+          - name: ENV_PERSIST_MODE
+            value: "AzureTable"
           - name: ENV_CLUSTER_AZURE_STORAGE
             valueFrom:
               secretKeyRef:
@@ -33,6 +48,28 @@ spec:
               secretKeyRef:
                 name: {storage-secret-name}
                 key: connection-string
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: ORLEANS_SERVICE_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['orleans/serviceId']
+          - name: ORLEANS_CLUSTER_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['orleans/clusterId']
+          - name: DOTNET_SHUTDOWNTIMEOUTSECONDS
+            value: "120"
         ports:
         - name: http
           containerPort: 80
@@ -45,7 +82,12 @@ spec:
           protocol: TCP
         - name: dashboard
           containerPort: 8080
-          protocol: TCP
+          protocol: TCP        
+  minReadySeconds: 60
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1  
 ---
 kind: Service
 apiVersion: v1

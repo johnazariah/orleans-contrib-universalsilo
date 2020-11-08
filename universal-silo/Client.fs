@@ -13,8 +13,8 @@ open System.IO
 open System.Net
 open System.Threading
 open System.Threading.Tasks
-open Orleans.Contrib.UniversalSilo.Configuration
 open Orleans.Clustering.AzureStorage
+open Orleans.Contrib.UniversalSilo
 
 type HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext
 

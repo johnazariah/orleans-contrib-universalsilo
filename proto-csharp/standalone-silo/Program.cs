@@ -1,12 +1,15 @@
-﻿using Microsoft.Extensions.Hosting;
-using Orleans.Contrib.UniversalSilo.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Orleans.Contrib.UniversalSilo;
+using System.IO;
+using static Orleans.Contrib.UniversalSilo.Configuration;
 
 namespace GeneratedProjectName.StandaloneSilo
 {
     /// <summary>
     /// Override methods in this class to take over how the silo is configured
     /// </summary>
-    class SiloConfigurator : Orleans.Contrib.UniversalSilo.SiloConfigurator
+    internal class SiloConfigurator : Configuration.SiloConfigurator
     {
         public override SiloConfiguration SiloConfiguration =>
             base.SiloConfiguration
@@ -40,7 +43,7 @@ namespace GeneratedProjectName.StandaloneSilo
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host
             .CreateDefaultBuilder(args)
-            .ConfigureHostConfigurationDefaults()
-            .UseOrleans(new SiloConfigurator().ConfigureSiloHost);
+            .ConfigureHostConfiguration(builder => builder.SetBasePath(Directory.GetCurrentDirectory()))
+            .UseOrleans(new SiloConfigurator().ConfigurationFunc);
     }
 }

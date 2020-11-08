@@ -1,17 +1,32 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Orleans.Contrib.UniversalSilo.Configuration;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.ResponseCompression;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Reflection;
+using System.Text.Json.Serialization;
+using static Orleans.Contrib.UniversalSilo.Configuration;
+using static Orleans.Contrib.UniversalSilo.HealthChecks;
+using Orleans.Contrib.UniversalSilo;
 
 namespace GeneratedProjectName.WebApiDirectClient
 {
     /// <summary>
     /// Override methods in this class to take over how the web-api host is configured
     /// </summary>
-    class WebApiConfigurator : Orleans.Contrib.UniversalSilo.WebApiConfigurator
+    static class WebApiConfigurator
     {
-        private static readonly OpenApiInfo _apiInfo =
+        private static readonly OpenApiInfo apiInfo =
             new OpenApiInfo
             {
                 Version = "v1",                                                                // revision this appropriately
@@ -31,14 +46,82 @@ namespace GeneratedProjectName.WebApiDirectClient
                 },
             };
 
-        public WebApiConfigurator() : base(_apiInfo, false)
-        { }
+        private static bool useHttpsRedirection = false;        
+
+        private static Dictionary<HealthStatus, int> healthResultStatusCodes = new Dictionary<HealthStatus, int>()
+        {
+            [HealthStatus.Healthy  ] = StatusCodes.Status200OK,
+            [HealthStatus.Degraded ] = StatusCodes.Status200OK,
+            [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+        };
+
+        public static IHostBuilder ConfigureWebApi(this IHostBuilder hostBuilder) => 
+            hostBuilder
+                .ConfigureWebHostDefaults(webHostBuilder =>
+                    webHostBuilder
+                        .Configure((webHostBuilderContext, applicationBuilder) =>
+                            {
+                                var hostEnv = webHostBuilderContext.HostingEnvironment;
+                                var swaggerUri = "/swagger/v1/swagger.json";
+                                var swaggerName = $"{apiInfo.Title} {apiInfo.Version}";
+
+                                var builder = hostEnv.IsDevelopment() ? applicationBuilder.UseDeveloperExceptionPage() : applicationBuilder;
+                                if (useHttpsRedirection) builder.UseHttpsRedirection();
+
+                                builder
+                                    .UseDefaultFiles()
+                                    .UseStaticFiles()
+                                    .UseSwagger()
+                                    .UseSwaggerUI(options => options.SwaggerEndpoint(swaggerUri, swaggerName))
+                                    .UseResponseCompression()
+                                    .UseRouting()
+                                    .UseAuthorization()
+                                    .UseEndpoints(endpoints =>
+                                        {
+                                            endpoints.MapControllers();
+                                            endpoints.MapHealthChecks(
+                                                "/health",
+                                                new HealthCheckOptions()
+                                                {
+                                                    AllowCachingResponses = false,
+                                                    ResultStatusCodes = healthResultStatusCodes
+                                                });
+                                        });
+                            })
+                        .UseSetting(WebHostDefaults.ApplicationKey, Assembly.GetEntryAssembly().GetName().Name))
+                .ConfigureServices((hostBuilderContext, services) =>
+                {
+                    services
+                        .AddControllers()
+                        .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+                    var xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
+                    var xmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, xmlFile);
+                    services.AddSwaggerGen(options =>
+                        {
+                            options.SwaggerDoc(apiInfo.Version, apiInfo);
+                            options.EnableAnnotations();
+                            options.IncludeXmlComments(xmlPath);
+                        });
+
+                    services
+                        .AddHealthChecks()
+                        .AddCheck<ClusterHealthCheck>(nameof(ClusterHealthCheck))
+                        .AddCheck<LocalHealthCheck>(nameof(LocalHealthCheck))
+                        .AddCheck<StorageHealthCheck>(nameof(StorageHealthCheck))
+                        .AddCheck<SiloHealthCheck>(nameof(SiloHealthCheck));
+
+                    services
+                        .AddResponseCompression()
+                        .Configure((BrotliCompressionProviderOptions options) => { options.Level = CompressionLevel.Optimal; })
+                        .Configure((GzipCompressionProviderOptions options) => { options.Level = CompressionLevel.Optimal; });
+                });
     }
 
     /// <summary>
     /// Override methods in this class to take over how the silo is configured
     /// </summary>
-    class SiloConfigurator : Orleans.Contrib.UniversalSilo.SiloConfigurator
+    class SiloConfigurator : Configuration.SiloConfigurator
     {
         public override SiloConfiguration SiloConfiguration =>
             base.SiloConfiguration
@@ -72,8 +155,8 @@ namespace GeneratedProjectName.WebApiDirectClient
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host
             .CreateDefaultBuilder(args)
-            .ConfigureHostConfigurationDefaults()
-            .ApplyHostConfigurationFunc(new WebApiConfigurator().ConfigureWebApiHost)
-            .UseOrleans(new SiloConfigurator().ConfigureSiloHost);
+            .ConfigureHostConfiguration(builder => builder.SetBasePath(Directory.GetCurrentDirectory()))            
+            .UseOrleans(new SiloConfigurator().ConfigurationFunc)
+            .ConfigureWebApi();
     }
 }
