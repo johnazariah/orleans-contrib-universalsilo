@@ -46,30 +46,21 @@ The template "Orleans: WebAPI Direct Client" was created successfully.
 - [Creating a Silo with a WebAPI interface](first-create-application.md)
 - [Simple Configuration](config-simple-configuration.md)
 
-### Running Your Application
-- [Development and Deployment Workflows](running-workflows.md)
-- [Running from the command-line](running-commandline.md)
-- Running with Tye
+### The Development/Deployment Workflow
+- [Development and Deployment Workflow Stages](development-workflow.md)
+- [Makefile Target Reference](makefile-target-reference.md)
 
 ### Developing Your Application
 - [Defining Grains](grain-development.md)
 - [Testing Grains](grain-testing.md)
 
-### Configuring Your Application
-- Configuration Order
+### Customizing and Configuring Your Application
+- [Customizing WebAPI](customizing-webapi.md)
 
 ### Extending Your Application
 - Extending the Silo
 - Extending the Webapi FrontEnd
 - Extending the Client
-
-### Building and Packaging Your Application
-- As a .NET Core Application
-- As a Docker Image
-
-### Deploying Your Application
-- On AKS
-- Using Tye
 
 ### CI/CD
 - On Github

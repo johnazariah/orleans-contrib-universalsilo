@@ -1,3 +1,3 @@
 name: Orleans (Contrib) Universal Silo
-description: An opinionated, batteries-included, set of templates and libraries to enable you to easily start developing applications with Microsoft Orleans.
+description: An opinionated, batteries-included, set of templates and libraries to enable you to easily start developing applications with Microsoft Orleans on Azure.
 theme: jekyll-theme-slate

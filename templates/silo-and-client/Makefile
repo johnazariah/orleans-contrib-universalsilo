@@ -52,6 +52,9 @@ dotnet-publish dotnet-run:
 	$(MAKE) -f $(silo).Makefile   $@
 	$(MAKE) -f $(client).Makefile $@
 
+dotnet-all: dotnet-clean dotnet-test dotnet-test dotnet-publish dotnet-run
+	@echo
+	
 # Docker commands
 docker-build docker-push docker-run docker-image-explore docker-show:
 	$(MAKE) -f $(silo).Makefile   $@

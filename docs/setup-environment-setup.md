@@ -35,11 +35,12 @@ If you want to explore the possibilities of packaging your application in Docker
 
 This will come with a version of Kubernetes that runs on your desktop as well, so ensure you enable it.
 
-### Azure CLI and Azure Storage Emulator
-We'll use the Azure CLI for command line operations and Azure Storage Emulator for a local version of Azure storage.
-You can find these in the "Command-line tools" tab [here](https://azure.microsoft.com/en-us/downloads/).
+### Azure Storage Emulator and Azure Storage Explorer
+We'll use the Azure Storage Emulator for a local version of Azure storage. You'll find the [installer](https://go.microsoft.com/fwlink/?LinkId=717179&clcid=0x409) and [documentation](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator).
 
 Ensure you start up the Azure Storage Emulator before you run your application.
+
+We'll also use Azure Storage Explorer to inspect the contents of an Azure storage account. You'll find the [installer](https://azure.microsoft.com/en-us/features/storage-explorer/) and [documentation](https://docs.microsoft.com/en-us/azure/vs-azure-tools-storage-manage-with-storage-explorer).
 
 ## Setting up your Development Environment on Mac or Linux
 
