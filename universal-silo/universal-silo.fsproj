@@ -12,11 +12,9 @@
 
   <ItemGroup>
     <Compile Include="Utilities.fs" />
-    <Compile Include="Configuration.fs" />
+    <Compile Include="Silo.fs" />
     <Compile Include="Client.fs" />
     <Compile Include="HealthChecks.fs" />
-    <Compile Include="SiloConfigurator.fs" />
-    <Compile Include="WebApiConfigurator.fs" />
     <Compile Include="TestingHost.fs" />
   </ItemGroup>
 

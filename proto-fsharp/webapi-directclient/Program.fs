@@ -1,12 +1,32 @@
 ﻿namespace GeneratedProjectName.WebApiDirectClient
 
+open Microsoft.AspNetCore.Builder
+open Microsoft.AspNetCore.Hosting
+open Microsoft.AspNetCore.ResponseCompression
+open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.OpenApi.Models
 open System
-open Orleans.Contrib.UniversalSilo.Configuration.Extensions
+open System.IO
+open System.IO.Compression
+open System.Reflection
+open System.Text.Json.Serialization
+open Microsoft.Extensions.Configuration
+open Microsoft.AspNetCore.Diagnostics.HealthChecks
+open Microsoft.Extensions.Diagnostics.HealthChecks
+open Microsoft.AspNetCore.Http
+open Orleans.Contrib.UniversalSilo
 
 [<AutoOpen>]
-module OpenApiConfiguration =
+module WebApiConfigurator =
+    let private healthResultStatusCodes =
+        [
+            (HealthStatus.Healthy,   StatusCodes.Status200OK);
+            (HealthStatus.Degraded,  StatusCodes.Status200OK);
+            (HealthStatus.Unhealthy, StatusCodes.Status503ServiceUnavailable)
+        ]
+        |> dict
+
     let private Version = "v1"                                                                    // revision this appropriately
     let private Title = "My Orleans API"                                                          // title this application
     let private Description = "An application with an Orleans backend and a WebAPI interface"     // describe this application
@@ -19,7 +39,7 @@ module OpenApiConfiguration =
     let private Contact = new OpenApiContact(Name = Contact_Name, Email = Contact_Email, Url = Contact_Url)
     let private License = new OpenApiLicense(Name = License_Name, Url = License_Url)
 
-    let ApiInfo =
+    let apiInfo =
         OpenApiInfo(
             Version = Version,
             Title = Title,
@@ -28,14 +48,88 @@ module OpenApiConfiguration =
             Contact = Contact,
             License = License)
 
-/// Override methods in this class to take over how the web-api host is configured
-type WebApiConfigurator() = class
-    inherit Orleans.Contrib.UniversalSilo.WebApiConfigurator(OpenApiConfiguration.ApiInfo, false)
-end
+    let useHttpsRedirection = false
+
+    type IHostBuilder with
+        /// Configure the WebApi Host
+        member this.ConfigureWebApi() : IHostBuilder =
+            let configureApp (webHostBuilderContext : WebHostBuilderContext) (applicationBuilder : IApplicationBuilder) =
+                let hostEnv = webHostBuilderContext.HostingEnvironment                        
+                let swaggerUri  = "/swagger/v1/swagger.json"
+                let swaggerName = sprintf "%s %s" apiInfo.Title apiInfo.Version
+
+                let builder =
+                    match hostEnv.IsDevelopment() with
+                    | false -> applicationBuilder
+                    | true  -> applicationBuilder.UseDeveloperExceptionPage()
+
+                if useHttpsRedirection then 
+                    ignore <| builder.UseHttpsRedirection()
+
+                builder
+                    .UseDefaultFiles()
+                    .UseStaticFiles()
+                    .UseSwagger()
+                    .UseSwaggerUI(fun options -> options.SwaggerEndpoint(swaggerUri, swaggerName))
+                    .UseResponseCompression()
+                    .UseRouting()
+                    .UseAuthorization()
+                    .UseEndpoints(fun endpoints ->
+                        endpoints.MapControllers()
+                        |> ignore
+
+                        endpoints.MapHealthChecks(
+                            "/health",
+                            new HealthCheckOptions(
+                                AllowCachingResponses = false,
+                                ResultStatusCodes = healthResultStatusCodes
+                            ))
+                        |> ignore)
+                |> ignore
+
+            let configureServices (hostBuilderContext : HostBuilderContext) (services : IServiceCollection) =
+                services
+                    .AddControllers()
+                    .AddJsonOptions(fun options -> options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
+                |> ignore
+
+                let xmlFile = sprintf "%s.xml" (Assembly.GetEntryAssembly().GetName().Name)
+                let xmlPath = Path.Combine (AppDomain.CurrentDomain.BaseDirectory, xmlFile)
+                services.AddSwaggerGen(fun options ->
+                    options.SwaggerDoc (apiInfo.Version, apiInfo)
+                    options.EnableAnnotations()
+                    options.IncludeXmlComments(xmlPath))
+                |> ignore
+
+                services
+                    .AddHealthChecks()
+                    .AddCheck<ClusterHealthCheck>(nameof(ClusterHealthCheck))
+                    .AddCheck<LocalHealthCheck>(nameof(LocalHealthCheck))
+                    .AddCheck<StorageHealthCheck>(nameof(StorageHealthCheck))
+                    .AddCheck<SiloHealthCheck>(nameof(SiloHealthCheck))
+                |> ignore
+
+                services
+                    .AddResponseCompression()
+                    .Configure(fun (options : BrotliCompressionProviderOptions) ->
+                        options.Level <- CompressionLevel.Optimal)
+                    .Configure(fun (options : GzipCompressionProviderOptions) ->
+                        options.Level <- CompressionLevel.Optimal)
+                |> ignore
+
+            this
+                .ConfigureWebHostDefaults(fun webHostBuilder ->
+                    webHostBuilder
+                        .Configure(configureApp)
+                        .UseSetting(WebHostDefaults.ApplicationKey, Assembly.GetEntryAssembly().GetName().Name)
+                        |> ignore)
+                .ConfigureServices(configureServices)
+
+
 
 /// Override methods in this class to take over how the silo is configured
 type SiloConfigurator () = class
-    inherit Orleans.Contrib.UniversalSilo.SiloConfigurator()
+    inherit Orleans.Contrib.UniversalSilo.Configuration.SiloConfigurator()
 
     override __.SiloConfiguration =
         base.SiloConfiguration.ServiceId <- "GeneratedProjectName"
@@ -44,22 +138,12 @@ end
 
 module Program =
     /// This is the entry point to the silo.
-    ///
-    /// No changes should normally be needed here to start up a silo and a web-api front-end co-hosted in the same executable
-    ///
-    /// Provide the configuration of the silo to connect by any combination of
-    ///    * Working with the default configuration
-    ///    * Setting environment variables,
-    ///    * Providing a `clustering.json` file to configure clustering options
-    ///    * Providing a `persistence.json` file to configure storage provider options
-    ///    * Overriding methods in the `WebApiConfigurator` class
-    ///    * Overriding methods in the `SiloConfigurator` class
     [<EntryPoint>]
     let Main args =
         (Host.CreateDefaultBuilder args)
-            .ConfigureHostConfigurationDefaults()
+            .ConfigureHostConfiguration(fun builder -> ignore <| builder.SetBasePath(Directory.GetCurrentDirectory()))
             .UseOrleans((new SiloConfigurator()).ConfigurationFunc)
-            .ApplyHostConfigurationFunc((new WebApiConfigurator()).ConfigurationFunc)
+            .ConfigureWebApi()
             .Build()
             .Run()
         0

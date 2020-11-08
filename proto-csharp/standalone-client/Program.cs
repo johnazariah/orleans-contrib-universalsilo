@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Orleans;
 using Orleans.Contrib.UniversalSilo.ClusterClient;
-using Orleans.Contrib.UniversalSilo.Configuration;
 using System;
 using System.Threading.Tasks;
 using GeneratedProjectName.Contract;
+using static Orleans.Contrib.UniversalSilo.Configuration;
+using Orleans.Contrib.UniversalSilo;
 
 namespace GeneratedProjectName.StandaloneClient
 {
