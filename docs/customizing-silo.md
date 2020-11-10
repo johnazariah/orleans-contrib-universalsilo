@@ -49,4 +49,6 @@ In the project's `Program.cs`, you will find the following class:
 
 This class is the main customization point for the silo configuration boilerplate that comes with the `Orleans.UniversalSilo` library. 
 
-The extension points supported are functions and properties that can be overriden from the base class to adjust and extend the behaviour of the default configuration. Given the familiar `IConfiguration` and `ISiloBuilder` objects, as well as the `UniversalSiloConfiguration` object in some cases, you can extend the functionality by returning an appropriately configured `ISiloBuilder` object. 
+The extension points supported are functions and properties that can be overriden from the base class to adjust and extend the behaviour of the default configuration. 
+
+Uncomment the function you want to override, and given the familiar `IConfiguration` and `ISiloBuilder` objects, as well as the `UniversalSiloConfiguration` object in some cases, you can extend the functionality by returning an appropriately configured `ISiloBuilder` object. 
