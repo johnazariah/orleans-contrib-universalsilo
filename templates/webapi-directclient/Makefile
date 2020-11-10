@@ -23,7 +23,7 @@ image_tag             ?=$(git_branch).$(git_latest_hash)
 container_name        ?=$(oaks_acr_login_server)/$(project-lc):$(image_tag)
 
 # k8s namespace
-k8s_namespace=green
+k8s_namespace         ?=green
 
 # Initialize
 init : git-init
@@ -39,7 +39,7 @@ dotnet-publish :
 	dotnet publish --no-build $(project)/$(project)._PROJ_SUFFIX_ -c $(config) -o out/$(project)
 	@echo Built DotNet projects
 
-dotnet-test :
+dotnet-test : dotnet-build
 	dotnet test --no-build $(project).sln -c $(config)
 	@echo Built DotNet projects
 
@@ -59,7 +59,13 @@ dotnet-run :
 	powershell Start-Process 'out/$(project)/$(project).exe' -WorkingDirectory 'out/$(project)'
 	@echo Launched DotNet projects
 
+dotnet-all: dotnet-clean dotnet-test dotnet-test dotnet-publish dotnet-run
+	@echo
+
 # Docker commands
+docker-list :
+	docker images
+
 docker-build :
 	docker build . --rm --build-arg config=$(config) --file Dockerfile --tag $(container_name)
 	@echo Built and tagged images
@@ -77,10 +83,10 @@ docker-run :
 	'-p','8080:8080',\
 	'$(container_name)'
 
-docker-run-hostlocal :
+docker-run-local-ase :
 	powershell Start-Process powershell -ArgumentList \
 	'docker','run','--rm',\
-	'-e','ENV_CLUSTER_MODE=HostLocal',\
+	'-e','ENV_CLUSTER_MODE=Azure',\
 	'-p','30000:30000',\
 	'-p','11111:11111',\
 	'-p','5000:80',\
@@ -200,7 +206,7 @@ az-new-all : az-new-org az-new-proj
 az-new-org : oaks-setup
 	@echo Completed setting up new organization [$(org)]]
 
-az-new-proj :  paks-setup paks-prepare-aks
+az-new-proj :  paks-setup paks-prepare-aks oaks-login-acr
 	@echo Completed setting up new project [$(project)] in organization [$(org)]
 
 oaks-cleanup:
@@ -330,7 +336,7 @@ aks-switch-context :
 	KUBECONFIG=$$HOME/.kube/config:.aks_kube_config kubectl config view --merge --flatten > ~/.kube/merged_kubeconfig && mv ~/.kube/merged_kubeconfig ~/.kube/config
 	kubectl config use-context $(paks_cluster)
 
-aks-acr-login : aks-switch-context
+aks-acr-login :
 	- docker login $(oaks_acr_login_server) -u 00000000-0000-0000-0000-000000000000 -p $(oaks_acr_login_token)
 
 aks-set-secrets : k8s-create-namespace aks-set-storage-secret
@@ -341,3 +347,6 @@ aks-set-storage-secret :
 	kubectl create secret generic $(paks_storage_secret)\
 		--namespace $(k8s_namespace)\
 		--from-literal=connection-string=$(paks_storage_connection_string)
+
+aks-prepare : aks-acr-login aks-switch-context aks-set-secrets
+	@echo Prepared context to run against remote AKS!

@@ -56,6 +56,9 @@ dotnet-run :
 	powershell Start-Process 'out/$(project)/$(project).exe' -WorkingDirectory 'out/$(project)'
 	@echo Launched DotNet projects
 
+dotnet-all: dotnet-clean dotnet-test dotnet-test dotnet-publish dotnet-run
+	@echo
+	
 # Docker commands
 docker-build :
 	docker build . --rm --build-arg config=$(config) --file Dockerfile --tag $(container_name)
