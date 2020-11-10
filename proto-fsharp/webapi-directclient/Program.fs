@@ -134,6 +134,37 @@ type SiloConfigurator () = class
     override __.SiloConfiguration =
         base.SiloConfiguration.ServiceId <- "GeneratedProjectName"
         base.SiloConfiguration
+
+
+    // override __.ClusteringConfiguration = 
+    //    base.ClusteringConfiguration
+    
+    // override __.StorageProviderConfiguration = 
+    //    base.StorageProviderConfiguration
+    
+    // override __.TelemetryConfiguration = 
+    //    base.TelemetryConfiguration
+
+    // override __.ConfigureServices(configuration, siloSettings, siloBuilder) = 
+    //    base.ConfigureServices(configuration, siloSettings, siloBuilder)
+
+    // override __.ConfigureClustering(configuration, siloSettings, ISiloBuilder siloBuilder) =
+    //    base.ConfigureClustering(configuration, siloSettings, siloBuilder)
+
+    // override __.ConfigureStorageProvider(configuration, siloSettings, ISiloBuilder siloBuilder) = 
+    //    base.ConfigureStorageProvider(configuration, siloSettings, siloBuilder)
+
+    // override __.ConfigureReminderService(configuration, siloSettings, siloBuilder) =
+    //    base.ConfigureReminderService(configuration, siloSettings, siloBuilder)
+
+    // override __.ConfigureApplicationInsights(configuration, siloSettings, siloBuilder) =
+    //    base.ConfigureApplicationInsights(configuration, siloSettings, siloBuilder)
+
+    // override __.ConfigureDashboard(configuration, siloSettings, siloBuilder) =
+    //    base.ConfigureDashboard(configuration, siloSettings, siloBuilder)
+
+    // override __.ConfigureApplicationParts(siloBuilder) = 
+    //    base.ConfigureApplicationParts(siloBuilder)
 end
 
 module Program =

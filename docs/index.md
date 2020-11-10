@@ -50,18 +50,8 @@ The template "Orleans: WebAPI Direct Client" was created successfully.
 - [Development and Deployment Workflow Stages](development-workflow.md)
 - [Makefile Target Reference](makefile-target-reference.md)
 
-### Developing Your Application
-- [Defining Grains](grain-development.md)
-- [Testing Grains](grain-testing.md)
-
 ### Customizing and Configuring Your Application
-- [Customizing WebAPI](customizing-webapi.md)
-
-### Extending Your Application
-- Extending the Silo
-- Extending the Webapi FrontEnd
-- Extending the Client
+- [Customizing the SiloConfiguration](customizing-silo.md)
 
 ### CI/CD
 - On Github
-- On Azure Pipelines
