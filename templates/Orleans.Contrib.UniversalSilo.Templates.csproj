@@ -9,7 +9,7 @@
     <Description>These are templates to get you easily started with Orleans with very little boilerplate code</Description>
     <Authors>John Azariah</Authors>
     <PackageTags>dotnet-new;templates;orleans-universal-silo;orleans</PackageTags>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IncludeContentInPack>true</IncludeContentInPack>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <ContentTargetFolders>content</ContentTargetFolders>

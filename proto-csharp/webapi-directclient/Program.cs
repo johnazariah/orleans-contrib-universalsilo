@@ -46,7 +46,7 @@ namespace GeneratedProjectName.WebApiDirectClient
                 },
             };
 
-        private static bool useHttpsRedirection = false;        
+        private static bool useHttpsRedirection = false;
 
         private static Dictionary<HealthStatus, int> healthResultStatusCodes = new Dictionary<HealthStatus, int>()
         {
@@ -55,7 +55,7 @@ namespace GeneratedProjectName.WebApiDirectClient
             [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
         };
 
-        public static IHostBuilder ConfigureWebApi(this IHostBuilder hostBuilder) => 
+        public static IHostBuilder ConfigureWebApi(this IHostBuilder hostBuilder) =>
             hostBuilder
                 .ConfigureWebHostDefaults(webHostBuilder =>
                     webHostBuilder
@@ -127,22 +127,22 @@ namespace GeneratedProjectName.WebApiDirectClient
             base.SiloConfiguration
             .With(_c => _c.ServiceId = "GeneratedProjectName");
 
-        //public override ClusteringConfiguration ClusteringConfiguration => 
+        //public override ClusteringConfiguration ClusteringConfiguration =>
         //    base.ClusteringConfiguration;
-        
-        //public override StorageProviderConfiguration StorageProviderConfiguration => 
+
+        //public override StorageProviderConfiguration StorageProviderConfiguration =>
         //    base.StorageProviderConfiguration;
-        
-        //public override TelemetryConfiguration TelemetryConfiguration => 
+
+        //public override TelemetryConfiguration TelemetryConfiguration =>
         //    base.TelemetryConfiguration;
 
-        //public override Orleans.Hosting.ISiloBuilder ConfigureServices(IConfiguration configuration, UniversalSiloConfiguration siloSettings, Orleans.Hosting.ISiloBuilder siloBuilder) => 
+        //public override Orleans.Hosting.ISiloBuilder ConfigureServices(IConfiguration configuration, UniversalSiloConfiguration siloSettings, Orleans.Hosting.ISiloBuilder siloBuilder) =>
         //    base.ConfigureServices(configuration, siloSettings, siloBuilder);
 
         //public override Orleans.Hosting.ISiloBuilder ConfigureClustering(IConfiguration configuration, UniversalSiloConfiguration siloSettings, Orleans.Hosting.ISiloBuilder siloBuilder) =>
         //    base.ConfigureClustering(configuration, siloSettings, siloBuilder);
 
-        //public override Orleans.Hosting.ISiloBuilder ConfigureStorageProvider(IConfiguration configuration, UniversalSiloConfiguration siloSettings, Orleans.Hosting.ISiloBuilder siloBuilder) => 
+        //public override Orleans.Hosting.ISiloBuilder ConfigureStorageProvider(IConfiguration configuration, UniversalSiloConfiguration siloSettings, Orleans.Hosting.ISiloBuilder siloBuilder) =>
         //    base.ConfigureStorageProvider(configuration, siloSettings, siloBuilder);
 
         //public override Orleans.Hosting.ISiloBuilder ConfigureReminderService(IConfiguration configuration, UniversalSiloConfiguration siloSettings, Orleans.Hosting.ISiloBuilder siloBuilder) =>
@@ -154,9 +154,9 @@ namespace GeneratedProjectName.WebApiDirectClient
         //public override Orleans.Hosting.ISiloBuilder ConfigureDashboard(IConfiguration configuration, UniversalSiloConfiguration siloSettings, Orleans.Hosting.ISiloBuilder siloBuilder) =>
         //    base.ConfigureDashboard(configuration, siloSettings, siloBuilder);
 
-        //public override Orleans.Hosting.ISiloBuilder ConfigureApplicationParts(Orleans.Hosting.ISiloBuilder siloBuilder) => 
+        //public override Orleans.Hosting.ISiloBuilder ConfigureApplicationParts(Orleans.Hosting.ISiloBuilder siloBuilder) =>
         //    base.ConfigureApplicationParts(siloBuilder);
-        
+
         public SiloConfigurator() : base()
         { }
     }
@@ -185,7 +185,7 @@ namespace GeneratedProjectName.WebApiDirectClient
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host
             .CreateDefaultBuilder(args)
-            .ConfigureHostConfiguration(builder => builder.SetBasePath(Directory.GetCurrentDirectory()))            
+            .ConfigureHostConfiguration(builder => builder.SetBasePath(Directory.GetCurrentDirectory()))
             .UseOrleans(new SiloConfigurator().ConfigurationFunc)
             .ConfigureWebApi();
     }

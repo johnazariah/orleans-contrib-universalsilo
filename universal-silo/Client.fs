@@ -7,7 +7,6 @@ open Microsoft.Extensions.Logging
 open Orleans
 open Orleans.Configuration
 open Orleans.Hosting
-open Orleans.Runtime.Utils
 open System
 open System.IO
 open System.Net
@@ -15,6 +14,7 @@ open System.Threading
 open System.Threading.Tasks
 open Orleans.Clustering.AzureStorage
 open Orleans.Contrib.UniversalSilo
+open Orleans.Runtime
 
 type HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext
 
@@ -72,13 +72,13 @@ type ClientConfiguration() = class
             | ClusteringModes.Azure ->
                 let connectionString = clusteringConfiguration.ConnectionString
                 cb.UseAzureStorageClustering (fun (options : AzureStorageGatewayOptions) ->
-                    options.ConnectionString <- connectionString) |> ignore
+                    options.ConfigureTableServiceClient(connectionString)) |> ignore
                 logger.LogInformation ("{ClusteringMode} {ConnectionString}", clusteringConfiguration.ClusteringMode, connectionString)
 
             | ClusteringModes.Docker | ClusteringModes.HostLocal | _ ->
                 let siloAddress = clusteringConfiguration.SiloAddress
                 let gatewayPort = siloConfiguration.GatewayPort
-                let endpointUri = IPEndPoint (siloAddress, gatewayPort) |> ToGatewayUri
+                let endpointUri = IPEndPoint (siloAddress, gatewayPort) |> Orleans.Runtime.Utils.ToGatewayUri
                 cb.UseStaticClustering (fun (option : StaticGatewayListProviderOptions) ->
                     option.Gateways.Add <| endpointUri) |> ignore
                 logger.LogInformation ("{ClusteringMode} {EndpointUri}", clusteringConfiguration.ClusteringMode, endpointUri)

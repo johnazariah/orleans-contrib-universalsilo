@@ -320,8 +320,9 @@ module Configuration =
                 | ClusteringModes.Azure ->
                     let connectionString = siloSettings.ClusteringConfiguration.ConnectionString
                     logger.LogInformation("Configuring Azure Storage Clustering {ConnectionString}", connectionString)
-                    sb.UseAzureStorageClustering(fun (options : AzureStorageClusteringOptions) ->
-                        options.ConnectionString <- connectionString)
+
+                    sb.UseAzureStorageClustering (fun (options : AzureStorageClusteringOptions) ->
+                        options.ConfigureTableServiceClient(connectionString))
 
                 | ClusteringModes.Docker | ClusteringModes.HostLocal | _ ->
                     logger.LogInformation("Development Clustering running on [{SiloAddress}]:[{SiloPort}]", siloAddress, siloPort)
@@ -355,10 +356,10 @@ module Configuration =
                 match siloSettings.StorageProviderConfiguration.PersistenceMode with
                 | PersistenceModes.AzureTable ->
                     siloBuilder.AddAzureTableGrainStorageAsDefault(fun (option : AzureTableStorageOptions) ->
-                        option.ConnectionString <- siloSettings.StorageProviderConfiguration.ConnectionString)
+                        option.ConfigureTableServiceClient(siloSettings.StorageProviderConfiguration.ConnectionString))
                 | PersistenceModes.AzureBlob ->
                     siloBuilder.AddAzureBlobGrainStorageAsDefault(fun (option : AzureBlobStorageOptions) ->
-                        option.ConnectionString <- siloSettings.StorageProviderConfiguration.ConnectionString)
+                        option.ConfigureBlobServiceClient(siloSettings.StorageProviderConfiguration.ConnectionString))
                 | PersistenceModes.InMemory | _ ->
                     siloBuilder.AddMemoryGrainStorageAsDefault()
             finally
@@ -373,7 +374,7 @@ module Configuration =
                 match siloSettings.StorageProviderConfiguration.PersistenceMode with
                 | PersistenceModes.AzureTable | PersistenceModes.AzureBlob ->
                     siloBuilder.UseAzureTableReminderService(fun (option : AzureTableReminderStorageOptions) ->
-                        option.ConnectionString <- siloSettings.StorageProviderConfiguration.ConnectionString)
+                        option.ConfigureTableServiceClient(siloSettings.StorageProviderConfiguration.ConnectionString))
                 | PersistenceModes.InMemory | _ ->
                     siloBuilder.UseInMemoryReminderService()
             finally
