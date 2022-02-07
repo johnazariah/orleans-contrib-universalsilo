@@ -128,7 +128,7 @@ module HealthChecks =
                 logger.LogInformation <| sprintf "Running Silo Health Check at %O" currentTime
 
                 participants
-                |> Seq.filter(fun p -> not <| p.CheckHealth currentTime)
+                |> Seq.filter(fun p -> p.CheckHealth currentTime |> (fst >> not))
                 |> Seq.length
                 |> function
                     | count when (count > 0) ->

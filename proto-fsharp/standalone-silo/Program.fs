@@ -26,7 +26,7 @@ module Program =
     ///    * Overriding methods in the `SiloConfigurator` class
     [<EntryPoint>]
     let Main args =
-        (Host.CreateDefaultBuilder args)            
+        (Host.CreateDefaultBuilder args)
             .ConfigureHostConfiguration(fun builder -> ignore <| builder.SetBasePath(Directory.GetCurrentDirectory()))
             .UseOrleans((new SiloConfigurator()).ConfigurationFunc)
             .Build()

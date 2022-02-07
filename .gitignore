@@ -235,3 +235,4 @@ persistence.json
 clustering.json
 scratch/
 Setup.cfg
+.fake

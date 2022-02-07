@@ -54,7 +54,7 @@ module WebApiConfigurator =
         /// Configure the WebApi Host
         member this.ConfigureWebApi() : IHostBuilder =
             let configureApp (webHostBuilderContext : WebHostBuilderContext) (applicationBuilder : IApplicationBuilder) =
-                let hostEnv = webHostBuilderContext.HostingEnvironment                        
+                let hostEnv = webHostBuilderContext.HostingEnvironment
                 let swaggerUri  = "/swagger/v1/swagger.json"
                 let swaggerName = sprintf "%s %s" apiInfo.Title apiInfo.Version
 
@@ -63,7 +63,7 @@ module WebApiConfigurator =
                     | false -> applicationBuilder
                     | true  -> applicationBuilder.UseDeveloperExceptionPage()
 
-                if useHttpsRedirection then 
+                if useHttpsRedirection then
                     ignore <| builder.UseHttpsRedirection()
 
                 builder
@@ -136,22 +136,22 @@ type SiloConfigurator () = class
         base.SiloConfiguration
 
 
-    // override __.ClusteringConfiguration = 
+    // override __.ClusteringConfiguration =
     //    base.ClusteringConfiguration
-    
-    // override __.StorageProviderConfiguration = 
+
+    // override __.StorageProviderConfiguration =
     //    base.StorageProviderConfiguration
-    
-    // override __.TelemetryConfiguration = 
+
+    // override __.TelemetryConfiguration =
     //    base.TelemetryConfiguration
 
-    // override __.ConfigureServices(configuration, siloSettings, siloBuilder) = 
+    // override __.ConfigureServices(configuration, siloSettings, siloBuilder) =
     //    base.ConfigureServices(configuration, siloSettings, siloBuilder)
 
     // override __.ConfigureClustering(configuration, siloSettings, ISiloBuilder siloBuilder) =
     //    base.ConfigureClustering(configuration, siloSettings, siloBuilder)
 
-    // override __.ConfigureStorageProvider(configuration, siloSettings, ISiloBuilder siloBuilder) = 
+    // override __.ConfigureStorageProvider(configuration, siloSettings, ISiloBuilder siloBuilder) =
     //    base.ConfigureStorageProvider(configuration, siloSettings, siloBuilder)
 
     // override __.ConfigureReminderService(configuration, siloSettings, siloBuilder) =
@@ -163,7 +163,7 @@ type SiloConfigurator () = class
     // override __.ConfigureDashboard(configuration, siloSettings, siloBuilder) =
     //    base.ConfigureDashboard(configuration, siloSettings, siloBuilder)
 
-    // override __.ConfigureApplicationParts(siloBuilder) = 
+    // override __.ConfigureApplicationParts(siloBuilder) =
     //    base.ConfigureApplicationParts(siloBuilder)
 end
 
