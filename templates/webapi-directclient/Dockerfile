@@ -1,5 +1,5 @@
 # server build container
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 ARG config=Release
 COPY . "/src"
 RUN dotnet restore "/src/GeneratedProjectName/GeneratedProjectName._PROJ_SUFFIX_"
@@ -8,7 +8,7 @@ RUN dotnet test --no-build "/src/GeneratedProjectName/GeneratedProjectName._PROJ
 RUN dotnet publish --no-build  "/src/GeneratedProjectName/GeneratedProjectName._PROJ_SUFFIX_" -c ${config} -o /app
 
 # container to run the server from
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS release
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS release
 WORKDIR /app
 EXPOSE 30000 11111 8080 80
 

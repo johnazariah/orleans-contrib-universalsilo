@@ -204,7 +204,7 @@ pack-template-pack :
 	$(MAKE) project_path=$(scratch)/build/Orleans.Contrib.UniversalSilo.Templates.csproj package_name=Orleans.Contrib.UniversalSilo.Templates package_version=$(LibraryVersion) pack
 
 uninstall-template-pack :
-	dotnet new -u Orleans.Contrib.UniversalSilo.Templates
+	- dotnet new -u Orleans.Contrib.UniversalSilo.Templates
 
 install-template-pack : uninstall-template-pack
 	dotnet new -i Orleans.Contrib.UniversalSilo.Templates.$(LibraryVersion).nupkg
