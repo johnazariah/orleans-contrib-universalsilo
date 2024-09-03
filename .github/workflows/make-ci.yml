@@ -45,7 +45,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
     - name: download-template-pack
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with:
         name: template-pack
     - name: install-template-pack
